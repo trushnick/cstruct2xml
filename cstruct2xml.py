@@ -10,10 +10,18 @@ _directory = ''
 
 
 class Structure:
-    name = ''
+    description = ''        # comment before definition
+    name = ''               # name in the end of definition
+    variables = []          # tuple (comment, type, name)
+    inner_structures = []   # class structure
 
 
 def extract(string):
+    """
+    Extracts definitions from given string.
+    :param string: String from which definitions will be extracted (str)
+    :return: List of strings-definitions (list of str)
+    """
     match = _pattern.match(string)
     definitions = []
     while match:
@@ -34,21 +42,37 @@ def extract(string):
 
 
 def lex(definition):
-    pass
+    """
+    Breaks given definition into tokens
+    :param definition: definition (str)
+    :return: list of tokens (list of tuples)
+    """
+    tokens = []
+    return tokens
 
 
 def parse(lexed_definition):
+    """
+    Parses already lexed definition.
+    :param lexed_definition: return of lex function (list of tuples)
+    :return: parsed definition (Structure)
+    """
     structure = Structure()
     return structure
 
 
 def convert(parsed_definition):
+    """
+    Converts parsed definition into XML-markup
+    :param parsed_definition: Parsed definition (Structure)
+    :return: XML-markup (str)
+    """
     xml = ''
     return xml
 
 
 def _process_dir(dir_path):
-    # print("Processing directory: " + dir_path)
+    print("Processing directory: " + dir_path)
     for path in os.listdir(dir_path):
         full_path = os.path.join(dir_path, path)
         if os.path.isdir(full_path):
@@ -58,7 +82,7 @@ def _process_dir(dir_path):
 
 
 def _process_file(file_path):
-    # print("Processing: " + file_path)
+    print("Processing: " + file_path + "... ", end='')
     with open('file_name', 'rb') as f:
         context = f.read().decode(_encoding)
     definitions = extract(context)
@@ -73,6 +97,7 @@ def _process_file(file_path):
         output_path = os.path.join(output_dirname, xml_filename)
         with open(output_path, 'wb+') as f:
             f.write(convert(struct).encode("utf-8"))
+    print("Done.")
 
 
 def main():
@@ -85,7 +110,6 @@ def main():
     opt_parser.add_option('-d', dest='directory',
                           help='Output XML-file to specific directory.', metavar='DIR')
     options, args = opt_parser.parse_args()
-    print(type(options))
     if options.encoding is not None:
         # TODO: Check if given encoding is correct
         _encoding = options.encoding
@@ -94,14 +118,21 @@ def main():
         _directory = options.directory
         if not os.path.isdir(_directory):
             exit("Provided directory is not existing directory.")
+    else:
+        _directory = 'DEFAULT ([file-dir]/cstruct2xml-output/)'
     print("Using encoding: " + _encoding)
     print("Using output directory: " + _directory)
     print("Converting files: " + str(args))
+    if len(args) == 0:
+        print("No files provided, GG!")
+        exit(0)
     for arg in args:
         if os.path.isdir(arg):
             _process_dir(arg)
         elif os.path.isfile(arg):
             _process_file(arg)
+        else:
+            print("Wrong argument: '" + arg + "'! Skipping...")
 
 
 if __name__ == '__main__':
