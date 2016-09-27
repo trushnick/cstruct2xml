@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import re
 import os
+from enum import Enum
 
 _pattern = re.compile(r'(?:(?:(?://[^\n]*\n)|(?:/\*(?:[^*]|(?:\*[^/]))*\*/))\s*)*'
                       r'typedef\s+struct\s+(?:[\w_][\w\d_]*)?\s*\{')
@@ -9,11 +10,42 @@ _encoding = 'utf-8'
 _directory = ''
 
 
+class TokenType(Enum):
+
+    WHITESPACE = r'\s+'
+    END_OF_LINE_COMMENT = r'//[^\n]\n'
+    TRADITIONAL_COMMENT = r'/\*([^\*]|\*[^/])*\*/'
+    TYPEDEF = r'typedef'
+    STRUCT = r'struct'
+    PRIMITIVE_TYPE = r''
+    VARIABLE_NAME = r'\w+'
+    ARRAY_SIZE = r'[1-9][0-9]*'
+    LCB = r'\{'
+    RCB = r'\}'
+    LSB = r'\['
+    RSB = r'\]'
+    SC = r';'
+
+    def description(self):
+        return "TokenType{\n\tName: " + self.name + "\n\tPattern: " + self.value + "\n}"
+
+    def type(self):
+        return self.name
+
+    def pattern(self):
+        return self.value
+
+
 class Structure:
     description = ''        # comment before definition
     name = ''               # name in the end of definition
     variables = []          # tuple (comment, type, name)
     inner_structures = []   # class structure
+
+
+class Token:
+    type = ''               # token's type
+    value = ''              # token's value
 
 
 def extract(string):
@@ -48,6 +80,8 @@ def lex(definition):
     :return: list of tokens (list of tuples)
     """
     tokens = []
+    lexeme_begin = 0
+    forward = 0
     return tokens
 
 
@@ -124,7 +158,7 @@ def main():
     print("Using output directory: " + _directory)
     print("Converting files: " + str(args))
     if len(args) == 0:
-        print("No files provided, GG!")
+        print("No files provided, exiting.")
         exit(0)
     for arg in args:
         if os.path.isdir(arg):
