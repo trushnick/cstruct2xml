@@ -3,6 +3,7 @@
 import optparse
 import os
 import codecs
+from cstruct2xml import *
 
 
 def _process_dir(dir_path):
@@ -17,20 +18,9 @@ def _process_dir(dir_path):
 
 def _process_file(file_path):
     print("Processing: " + file_path + "... ", end='')
-    with open('file_name', 'rb') as f:
-        context = f.read().decode(_encoding)
-    definitions = extract(context)
-    lexed = [lex(definition) for definition in definitions]
-    parsed = [parse(definition) for definition in lexed]
-    for struct in parsed:
-        xml_filename = os.path.splitext(os.path.basename(file_path))[0] + struct.name + '.xml'
-        output_dirname = os.path.join(os.path.dirname(file_path),
-                                      'cstruct2xml-output') if _output_directory == '' else _output_directory
-        if not os.path.exists(output_dirname):
-            os.mkdir(output_dirname)
-        output_path = os.path.join(output_dirname, xml_filename)
-        with open(output_path, 'wb+') as f:
-            f.write(convert(struct).encode("utf-8"))
+    definitions = [definition for definition in Extractor(file_path)]
+    lexed_defs = [Lexer(definition) for definition in definitions]
+    # TODO: parse and convert to xml (not implemented atm)
     print("Done.")
 
 
@@ -43,13 +33,18 @@ opt_parser.add_option('-d', dest='directory',
                       help='Output XML-file to specific directory.', metavar='DIR')
 options, args = opt_parser.parse_args()
 if options.encoding is not None:
-    # TODO: Check if given encoding is correct
+    try:
+        codecs.lookup(options.encoding)
+    except LookupError:
+        print("Encoding " + options.encoding + " is not supported!")
+        print(opt_parser.usage)
+        exit(1)
     _encoding = options.encoding
 if options.directory is not None:
-    # TODO: Check if correct path is given and directory exists
+    if not os.path.isdir(options.directory):
+        print("Directory '" + options.directory + "' doesn't exists")
+        exit(1)
     _output_directory = options.directory
-    if not os.path.isdir(_output_directory):
-        exit("Provided directory is not existing directory.")
 else:
     _output_directory = 'DEFAULT ([file-dir]/cstruct2xml-output/)'
 print("Using encoding: " + _encoding)

@@ -9,6 +9,9 @@ class Token:
         self.type = type
         self.value = value
 
+    def __len__(self):
+        return len(self.value)
+
 
 class TokenType(Enum):
 
