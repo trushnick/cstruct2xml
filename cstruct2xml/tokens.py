@@ -36,11 +36,5 @@ class TokenType(Enum):
     RSB = r'\]'
     SC = r';'
 
-    def description(self):
-        return "TokenType{\n\tName: " + self.name + "\n\tPattern: " + self.value + "\n}"
-
-    def type(self):
-        return self.name
-
     def pattern(self):
         return self.value
