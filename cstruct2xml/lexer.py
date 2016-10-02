@@ -14,15 +14,13 @@ class Lexer:
 
     def _consume(self, token):
         self.line_number += token.value.count('\n')
-        self.line_pos = len(token.value.split('\n')[-1])  # TODO: Is it okay?
+        self.line_pos = len(token.value.split('\n')[-1])
         self.pos += len(token.value)
 
     def __iter__(self):
         token = self._next_token()
         while token.type == TokenType.WHITESPACE:
             token = self._next_token()
-            self._consume(token)
-        self._consume(token)
         yield token
 
     def _next_token(self):
@@ -31,10 +29,11 @@ class Lexer:
             match = re.match(t_type.pattern(), self.input_text, self.pos)
             if match:
                 token = Token(t_type, match.group(0))
-                matches.append( (t_type,match))
+                matches.append(token)
         if not matches:
             raise LexerError
         best_match = max(matches, key=len)
+        self._consume(best_match)
         return best_match
 
 

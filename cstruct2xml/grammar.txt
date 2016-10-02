@@ -1,0 +1,58 @@
+# Grammmar
+
+structure_definition        ->  comment_block TYPEDEF STRUCT LCB structure_body RCB structure_name SC
+comment_block               ->  comment_block comment |
+                                comment
+comment                     ->  END_OF_LINE_COMMENT |
+                                TRADITIONAL_COMMENT
+structure_body              ->  structure_body inner_structure_definition |
+                                structure_body variable_declaration |
+                                inner_structure_definition |
+                                variable_declaration
+inner_structure_definition  ->  comment_block STRUCT LCB structure_body RCB structure_name SC
+variable_declaration        ->  comment_block variable_specification
+variable_specification      ->  variable_type VARIABLE_NAME SC |
+                                variable_type VARIABLE_NAME array_specifier SC
+variable_type               ->  primitive_type |
+                                users_type
+primitive_type              ->  TODO:
+users_type                  ->  VARIABLE_NAME
+array_specifier             ->  LSB array_size RSB
+array_size                  ->  NUMBER |
+                                VARIABLE_NAME |
+                                array_size_expression
+array_size_expression       ->  array_size_expression PLUS array_size_expression2 |
+                                array_size_expression MINUS array_size_expression2 |
+                                array_size_expression2
+array_size_expression2      ->  array_size_expression2 MUL array_size_expression3 |
+                                array_size_expression2 DIV array_size_expression3 |
+                                array_size_expression3
+array_size_expression3      ->  LB array_size_expression RB |
+                                NUMBER |
+                                VARIABLE_NAME
+structure_name              ->  VARIABLE_NAME
+
+
+# Terminals
+
+TYPEDEF             =   'typedef'
+STRUCT              =   'struct'
+
+END_OF_LINE_COMMENT =   '//[^\n]\n'
+TRADITIONAL_COMMENT =   '/\*([^\*]|\*[^/])*\*/'
+
+NUMBER              =   '[1-9][0-9]*'
+PLUS                =   '+'
+MINUS               =   '-'
+MUL                 =   '*'
+DIV                 =   '/'
+
+LCB                 =   '{'
+RCB                 =   '}'
+LSB                 =   '['
+RSB                 =   ']'
+LB                  =   '('
+RB                  =   ')'
+SC                  =   ';'
+
+WS                  =   '\s+' # skip
