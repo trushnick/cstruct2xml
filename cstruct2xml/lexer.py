@@ -31,11 +31,14 @@ class Lexer:
                 token = Token(t_type, match.group(0))
                 matches.append(token)
         if not matches:
-            raise LexerError
+            raise LexerError(self.line_number, self.line_pos, self.input_text[self.pos:self.pos + 10])
         best_match = max(matches, key=len)
         self._consume(best_match)
         return best_match
 
 
 class LexerError(Exception):
-    pass
+
+    def __init__(self, line_num, line_pos, text):
+        message = 'Cannot recognize lexeme at line {0} at pos {1}: {2}'.format(line_num, line_pos, text)
+        super(LexerError, self).__init__(message)
