@@ -32,7 +32,7 @@ class TokenType(Enum):
     SHORT = r'short'
 
     VARIABLE_NAME = r'\w+'
-    ARRAY_SIZE = r'[1-9][0-9]*'
+    NUMBER = r'[1-9][0-9]*'
     LCB = r'\{'
     RCB = r'\}'
     LSB = r'\['
