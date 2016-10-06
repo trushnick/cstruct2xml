@@ -23,7 +23,7 @@ class Extractor:
         while definition:
             yield definition
 
-    def next_def(self):
+    def _next_def(self):
         match = self._pattern.match(self.content, self.pos)
         while match:
             pos = match.end()

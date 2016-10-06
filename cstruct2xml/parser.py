@@ -20,20 +20,38 @@ class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.current = next(lexer)
+        self.structure = Structure()
 
     def parse(self):
         pass
 
     def _structure_definition(self):
-        pass
+        # structure_definition -> comment_block TYPEDEF STRUCT LCB struct_body RCB structure_name SC
+        self.structure.description = self._comment_block()
+        self._match(TokenType.TYPEDEF)
+        self._match(TokenType.STRUCT)
+        self._match(TokenType.LCB)
+        self._structure_body(self.structure)
+        self._match(TokenType.RCB)
+        self.structure.name = self._structure_name()
+        self._match(TokenType.SC)
+        return self.structure
 
     def _comment_block(self):
-        pass
+        # comment_block -> comment_block comment | comment
+        comment_block = ''
+        while self.current.type in [TokenType.END_OF_LINE_COMMENT, TokenType.TRADITIONAL_COMMENT]:
+            comment = self.current.type[2:]
+            if self.current.type == TokenType.TRADITIONAL_COMMENT:
+                comment = comment[:-2]
+                comment = '\n'.join(line.strip() for line in comment.split('\n'))
+            else:
+                comment = comment.strip()
+            comment_block += '\n' + comment
+            self.current = next(self.lexer)
+        return comment_block.strip()
 
-    def _comment(self):
-        pass
-
-    def _structure_body(self):
+    def _structure_body(self, structure):
         pass
 
     def _inner_structure_definition(self):
@@ -70,11 +88,14 @@ class Parser:
         pass
 
     def _structure_name(self):
-        pass
+        t = self._match(TokenType.VARIABLE_NAME)
+        return t.value
 
-    def _check_token(self, token_type):
-        if self.current.type == token_type:
-            return True
+    def _match(self, types):
+        if self.current.type in types:
+            token = self.current
+            self.current = next(self.lexer)
+            return token
         else:
             raise ParserError
 

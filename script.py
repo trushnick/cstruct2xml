@@ -19,7 +19,14 @@ def process_dir(dir_path):
 def process_file(file_path):
     print("Processing: " + file_path + "... ", end='')
     definitions = [definition for definition in Extractor(file_path, _encoding)]
-    lexed_defs = [Lexer(definition) for definition in definitions]
+    for definition in definitions:
+        lexer = Lexer(definition)
+        parser = Parser(lexer)
+        structure = parser.parse()
+        xml = convert(structure)
+        file_name = os.path.splitext(os.path.basename(file_path))[0] + '-' + structure.name + '.xml'
+        dir_name = _output_directory if _output_directory else os.path.dirname(file_path)
+
     # TODO: parse and convert to xml (not implemented atm)
     print("Done.")
 
