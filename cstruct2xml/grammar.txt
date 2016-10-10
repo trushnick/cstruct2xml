@@ -1,52 +1,81 @@
 # Grammmar
 
-structure_definition        ->  comment_block TYPEDEF STRUCT LCB structure_body RCB structure_name SC
+struct_def        			->  comment_block TYPEDEF STRUCT LCB struct_body RCB struct_name SC
 comment_block               ->  comment_block comment |
-                                comment
+                                comment |
+								%empty%
 comment                     ->  END_OF_LINE_COMMENT |
                                 TRADITIONAL_COMMENT
-structure_body              ->  structure_body inner_structure_definition |
-                                structure_body variable_declaration |
-                                inner_structure_definition |
-                                variable_declaration
-inner_structure_definition  ->  comment_block STRUCT LCB structure_body RCB structure_name SC
-variable_declaration        ->  comment_block variable_specification
-variable_specification      ->  variable_type VARIABLE_NAME SC |
-                                variable_type VARIABLE_NAME array_specifier SC
-variable_type               ->  primitive_type |
+struct_body              	->  struct_body struct_member |
+								struct_member
+struct_member				->	inner_struct_def |
+								var_decl
+inner_struct_def	  		->  comment_block STRUCT LCB struct_body RCB struct_name SC
+var_decl        			->  comment_block var_spec
+var_spec      				->  var_type VARIABLE_NAME SC |
+                                var_type VARIABLE_NAME array_specifier SC
+var_type               		->  prim_type |
                                 users_type
-primitive_type              ->  TODO:
+prim_type              		->  int_type |
+								float_type
+int_type					->	sign_mod |					# s/us integer, 32 bit
+								sign_mod INT |				# s/us integer, 32 bit
+								size_mod |					# s integer, size depends on type
+								size_mod INT |				# s integer, size depends on type
+								sign_mod size_mod |			# s/us integer, size depends on type
+								sign_mod size_mod INT |		# s/us integer, size depends on type
+								sign_mod CHAR |				# s/us integer, 8 bit
+								CHAR						# s/us integer (impl-depended), 8 bit
+sign_mod					->	SIGNED |
+								UNSIGNED
+size_mod					->	SHORT |
+								LONG |
+								LONG LONG
+float_type 					-> 	FLOAT |						# 32-bit floating point
+								DOUBLE |					# ??-bit floating point
+								LONG DOUBLE					# ??-bit floating point
 users_type                  ->  VARIABLE_NAME
-array_specifier             ->  LSB array_size RSB
-array_size                  ->  NUMBER |
-                                VARIABLE_NAME |
-                                array_size_expression
-array_size_expression       ->  array_size_expression PLUS array_size_expression2 |
-                                array_size_expression MINUS array_size_expression2 |
-                                array_size_expression2
-array_size_expression2      ->  array_size_expression2 MUL array_size_expression3 |
-                                array_size_expression2 DIV array_size_expression3 |
-                                array_size_expression3
-array_size_expression3      ->  LB array_size_expression RB |
+array_specifier             ->  LSB array_size_expr RSB
+array_size_expr       		->  array_size_expr2 PLUS array_size_expr |
+                                array_size_expr2 MINUS array_size_expr |
+                                array_size_expr2
+array_size_expr2      		->  array_size_expr3 MUL array_size_expr2 |
+                                array_size_expr3 DIV array_size_expr2 |
+                                array_size_expr3
+array_size_expr3      		->  LB array_size_expr RB |
                                 NUMBER |
                                 VARIABLE_NAME
-structure_name              ->  VARIABLE_NAME
+struct_name              	->  VARIABLE_NAME
 
 
 # Terminals
 
+# core
 TYPEDEF             =   'typedef'
 STRUCT              =   'struct'
 
+# comments
 END_OF_LINE_COMMENT =   '//[^\n]\n'
 TRADITIONAL_COMMENT =   '/\*([^\*]|\*[^/])*\*/'
 
+# arithmetics for array size
 NUMBER              =   '[1-9][0-9]*'
 PLUS                =   '+'
 MINUS               =   '-'
 MUL                 =   '*'
 DIV                 =   '/'
 
+# primitive types keywords
+CHAR				=	'char'
+SHORT				=	'short'
+INT					=	'int'
+LONG				=	'long'
+SIGNED				=	'signed'
+UNSIGNED			=	'unsigned'
+FLOAT				=	'float'
+DOUBLE				=	'double
+
+# brackets and semicolon
 LCB                 =   '{'
 RCB                 =   '}'
 LSB                 =   '['
@@ -55,4 +84,5 @@ LB                  =   '('
 RB                  =   ')'
 SC                  =   ';'
 
+# whitespaces
 WS                  =   '\s+' # skip
