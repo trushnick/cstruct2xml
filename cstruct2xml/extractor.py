@@ -19,7 +19,7 @@ class Extractor:
             raise ExtractorError
 
     def __iter__(self):
-        definition = self.next_def()
+        definition = self._next_def()
         while definition:
             yield definition
 
