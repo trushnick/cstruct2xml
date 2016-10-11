@@ -6,3 +6,4 @@ Converts C structures into XML-output.
 - pointers
 - type resolving
 - type equations (e.g. signed int -> int, signed short int -> short)
+- binary, octal and hex numbers in array size
