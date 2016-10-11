@@ -14,8 +14,9 @@ class TestExtractor(unittest.TestCase):
 					'extractor',
 					'test_extractor_inner_struct.h')
         defs = [definition for definition in Extractor(testcase)]
-        with open(testcase) as f:
-            content = f.read().split('=' * 20)
+        with open(testcase, 'rb') as f:
+            content = [s.strip() for s in 
+                            f.read().decode('utf-8').split('=' * 20)]
         self.assertEqual(defs, content)
 
     def test_simple(self):

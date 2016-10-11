@@ -22,10 +22,11 @@ class Extractor:
         definition = self._next_def()
         while definition:
             yield definition
+            definition = self._next_def()
 
     def _next_def(self):
         match = self._pattern.match(self.content, self.pos)
-        while match:
+        if match:
             pos = match.end()
             counter = 1
             while counter:
@@ -36,12 +37,10 @@ class Extractor:
                 pos += 1
             while self.content[pos] != ';':
                 pos += 1
-        if not match:
-            return None
+            self.pos = pos + 1
+            return self.content[match.start():pos + 1]
         else:
-            definition = self.content[match.start(): pos]
-            self.pos = pos
-            return definition
+            return None
 
 
 class ExtractorError(Exception):
