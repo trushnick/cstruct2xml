@@ -8,7 +8,7 @@ class Lexer:
 
     def __init__(self, input_text):
         self.input_text = input_text
-        self.line_number = 0
+        self.line_number = 1
         self.line_pos = 0
         self.pos = 0
 
@@ -23,8 +23,10 @@ class Lexer:
     def __iter__(self):
         while not self._done():
             token = self._next_token()
-            while token.type == TokenType.WHITESPACE:
+            while token.type == TokenType.WHITESPACE and not self._done():
                 token = self._next_token()
+            if self._done():  # TODO: Refactor
+                break
             yield token
 
     def _next_token(self):

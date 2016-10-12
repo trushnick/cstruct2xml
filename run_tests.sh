@@ -1,1 +1,2 @@
-python3 -m unittest discover -v
+#!/usr/bin/env bash
+python3 -m unittest discover -vb

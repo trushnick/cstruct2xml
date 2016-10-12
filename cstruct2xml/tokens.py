@@ -13,7 +13,7 @@ class Token:
         return len(self.value)
 
     def __str__(self):
-        return "<Token:: type:{}, value:{}".format(self.type, self.value)
+        return "<Token:: type:{}, value:{}".format(self.type, repr(self.value))
 
 
 class TokenType(Enum):
