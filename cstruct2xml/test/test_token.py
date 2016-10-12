@@ -27,7 +27,7 @@ class TestToken(unittest.TestCase):
 
     def test_traditional_comment(self):
         pattern = re.compile(TokenType.TRADITIONAL_COMMENT.pattern())
-        testcases_match = ['/* 123 */', '/****/', '/**123*321**/']
+        testcases_match = ['/* 123 */', '/****/', '/**123*321**/', '/**a///*/']
         testcases_no_match = ['/*/', '/*we1', '/*eda/', '//dfa*/']
         for testcase in testcases_match:
             self.assertNotEqual(pattern.match(testcase), None)
