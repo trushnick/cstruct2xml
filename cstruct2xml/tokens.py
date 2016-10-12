@@ -17,7 +17,7 @@ class TokenType(Enum):
 
     WHITESPACE = r'\s+'
 
-    END_OF_LINE_COMMENT = r'//[^\n]\n'
+    END_OF_LINE_COMMENT = r'//[^\n]*\n'
     TRADITIONAL_COMMENT = r'/\*([^\*]|\*[^/])*\*/'
 
     TYPEDEF = r'typedef'
