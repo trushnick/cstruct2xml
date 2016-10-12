@@ -14,19 +14,23 @@ class Lexer:
 
     def _consume(self, token):
         self.line_number += token.value.count('\n')
-        self.line_pos = len(token.value.split('\n')[-1])
+        if token.value.count('\n'):
+            self.line_pos = len(token.value.split('\n')[-1])
+        else:
+            self.line_pos += len(token.value)
         self.pos += len(token.value)
 
     def __iter__(self):
-        token = self._next_token()
-        while token.type == TokenType.WHITESPACE:
+        while not self._done():
             token = self._next_token()
-        yield token
+            while token.type == TokenType.WHITESPACE:
+                token = self._next_token()
+            yield token
 
     def _next_token(self):
         matches = []
         for t_type in TokenType:
-            match = re.match(t_type.pattern(), self.input_text, self.pos)
+            match = re.match(t_type.pattern(), self.input_text[self.pos:])
             if match:
                 token = Token(t_type, match.group(0))
                 matches.append(token)
@@ -35,6 +39,9 @@ class Lexer:
         best_match = max(matches, key=len)
         self._consume(best_match)
         return best_match
+
+    def _done(self):
+        return self.pos >= len(self.input_text) - 1
 
 
 class LexerError(Exception):

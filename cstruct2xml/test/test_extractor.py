@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import os
-
-from extractor import Extractor, ExtractorError
+from cstruct2xml.extractor import Extractor, ExtractorError
 
 
 class TestExtractor(unittest.TestCase):

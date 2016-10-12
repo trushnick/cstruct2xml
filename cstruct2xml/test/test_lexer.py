@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import unittest
-import os
 from cstruct2xml.lexer import Lexer, LexerError
-#from lexer import Lexer, LexerError
 
 
 class TestLexer(unittest.TestCase):
@@ -24,7 +22,7 @@ class TestLexer(unittest.TestCase):
         """
         lexer = Lexer(testcase)
         lexemes = list(lexer)
-        print( len(lexemes))
+        print(len(lexemes))
         self.assertEqual(len(lexemes), 29)
 
 

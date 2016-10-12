@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import re
-from tokens import TokenType
+from cstruct2xml.tokens import TokenType
 
 
 class TestToken(unittest.TestCase):
