@@ -21,10 +21,8 @@ class TestToken(unittest.TestCase):
         testcases_match = ['// 123 \n', '//12//3\n']
         testcases_no_match = ['// 123', '/*da/', 'dsalk']
         for testcase in testcases_match:
-            print(testcase)
             self.assertNotEqual(pattern.match(testcase), None)
         for testcase in testcases_no_match:
-            print(testcase)
             self.assertEqual(pattern.match(testcase), None)
 
     def test_traditional_comment(self):
@@ -32,10 +30,8 @@ class TestToken(unittest.TestCase):
         testcases_match = ['/* 123 */', '/****/', '/**123*321**/']
         testcases_no_match = ['/*/', '/*we1', '/*eda/', '//dfa*/']
         for testcase in testcases_match:
-            print(testcase)
             self.assertNotEqual(pattern.match(testcase), None)
         for testcase in testcases_no_match:
-            print(testcase)
             self.assertEqual(pattern.match(testcase), None)
 
     def test_variable_name(self):
@@ -43,19 +39,15 @@ class TestToken(unittest.TestCase):
         testcases_match = ['___', 'afgad', '_as123']
         testcases_no_match = ['^FGD', '$dfa', '/fsd']
         for testcase in testcases_match:
-            print(testcase)
             self.assertNotEqual(pattern.match(testcase), None)
         for testcase in testcases_no_match:
-            print(testcase)
             self.assertEqual(pattern.match(testcase), None)
 
     def test_number(self):
         pattern = re.compile(TokenType.NUMBER.pattern())
-        testcases_match = ['123', '0']
-        testcases_no_match = ['0123', '0x123', 'afd']
+        testcases_match = ['123', '345632']
+        testcases_no_match = ['0123', '0x123', 'afd', '0']
         for testcase in testcases_match:
-            print("Must match: " + testcase)
             self.assertNotEqual(pattern.match(testcase), None)
         for testcase in testcases_no_match:
-            print("Must not match: " + testcase)
             self.assertEqual(pattern.match(testcase), None)
