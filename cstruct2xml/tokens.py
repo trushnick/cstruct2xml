@@ -21,7 +21,7 @@ class TokenType(Enum):
     WHITESPACE = r'\s+'
 
     END_OF_LINE_COMMENT = r'//[^\n]*\n'
-    TRADITIONAL_COMMENT = r'/\*([^\*]|\**[^/])*\*/' # TODO: Is there a better solution than \** for multiple * in the end of comment?
+    TRADITIONAL_COMMENT = r'/\*([^\*]|\*+[^/])*\*+/' # TODO: Is there a better solution than \** for multiple * in the end of comment?
 
     TYPEDEF = r'typedef'
     STRUCT = r'struct'
