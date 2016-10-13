@@ -18,8 +18,7 @@ class TestLexer(unittest.TestCase):
                 }
                 signed short d[123];
                 unsigned char e[123 * (2 - 4) + 3 / 4 - a];
-            } StructName;
-        """
+            } StructName ;"""
         lexer = Lexer(testcase)
         lexemes = list(lexer)
         for lexeme in lexemes:

@@ -25,7 +25,7 @@ class Lexer:
             token = self._next_token()
             while token.type == TokenType.WHITESPACE and not self._done():
                 token = self._next_token()
-            if self._done():  # TODO: Refactor
+            if self._done() and token.type == TokenType.WHITESPACE:  # TODO: Refactor
                 break
             yield token
 
@@ -43,7 +43,7 @@ class Lexer:
         return best_match
 
     def _done(self):
-        return self.pos >= len(self.input_text) - 1
+        return self.pos >= len(self.input_text)
 
 
 class LexerError(Exception):
