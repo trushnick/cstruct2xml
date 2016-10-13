@@ -1,4 +1,5 @@
 # Grammmar
+# %empty% means empty string
 
 struct_def                  ->  comment_block TYPEDEF STRUCT LCB struct_body RCB struct_name SC
 comment_block               ->  comment_block comment |
@@ -18,22 +19,22 @@ var_type                    ->  prim_type |
                                 users_type
 prim_type                   ->  int_type |
                                 float_type
-int_type                    ->  sign_mod |                    # s/us integer, 32 bit
-                                sign_mod INT |                # s/us integer, 32 bit
-                                size_mod |                    # s integer, size depends on type
-                                size_mod INT |                # s integer, size depends on type
-                                sign_mod size_mod |            # s/us integer, size depends on type
-                                sign_mod size_mod INT |        # s/us integer, size depends on type
-                                sign_mod CHAR |                # s/us integer, 8 bit
-                                CHAR                        # s/us integer (impl-depended), 8 bit
+int_type                    ->  sign_mod |
+                                sign_mod INT |
+                                size_mod |
+                                size_mod INT |
+                                sign_mod size_mod |
+                                sign_mod size_mod INT |
+                                sign_mod CHAR |
+                                CHAR
 sign_mod                    ->  SIGNED |
                                 UNSIGNED
 size_mod                    ->  SHORT |
                                 LONG |
                                 LONG LONG
-float_type                  ->  FLOAT |                        # 32-bit floating point
-                                DOUBLE |                    # ??-bit floating point
-                                LONG DOUBLE                    # ??-bit floating point
+float_type                  ->  FLOAT |
+                                DOUBLE |
+                                LONG DOUBLE
 users_type                  ->  VARIABLE_NAME
 array_specifier             ->  LSB array_size_expr RSB
 array_size_expr             ->  array_size_expr2 PLUS array_size_expr |
@@ -67,13 +68,13 @@ DIV                 =   '/'
 
 # primitive types keywords
 CHAR                =    'char'
-SHORT                =    'short'
-INT                    =    'int'
+SHORT               =    'short'
+INT                 =    'int'
 LONG                =    'long'
-SIGNED                =    'signed'
+SIGNED              =    'signed'
 UNSIGNED            =    'unsigned'
-FLOAT                =    'float'
-DOUBLE                =    'double
+FLOAT               =    'float'
+DOUBLE              =    'double
 
 # brackets and semicolon
 LCB                 =   '{'

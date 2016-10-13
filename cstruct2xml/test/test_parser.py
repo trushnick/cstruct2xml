@@ -89,6 +89,6 @@ class TestParser(unittest.TestCase):
         lexer = Lexer(testcase)
         parser = Parser(lexer)
         with self.assertRaises(ParserError) as context:
-            parser.parse();
+            parser.parse()
         exception = context.exception
         self.assertTrue(exception.message.startswith('End of lexemes'))

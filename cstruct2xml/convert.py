@@ -5,7 +5,7 @@ from xml.dom import minidom
 
 
 def convert(structure):
-    return prettify(_convert_structure(structure))
+    return _prettify(_convert_structure(structure))
 
 
 def _convert_structure(structure):
@@ -54,6 +54,6 @@ def _convert_variable(variable):
     return var_el
 
 
-def prettify(top_element):
+def _prettify(top_element):
     xml = ET.tostring(top_element, 'utf-8')
     return minidom.parseString(xml).toprettyxml(indent='  ')

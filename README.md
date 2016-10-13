@@ -10,8 +10,8 @@ Converts C structures into XML-output.
 - arrays of inner structures
 
 # Tests
-To run tests you can use bash script `run_tests.sh`.
-Another way to run tests is to use following command from root directory of project:
+To run tests you can use bash script `run_tests.sh`.<br>
+Another way to run tests is to use following command from root directory of project:<br>
 `python3 -m unittest discover -v` or similar.
 
 # Usage

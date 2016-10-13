@@ -18,7 +18,7 @@ def process_dir(dir_path):
 
 def process_file(file_path):
     print("Processing: " + file_path + "... ", end='')
-    definitions = [definition for definition in Extractor(file_path, _encoding)]
+    definitions = list(Extractor(file_path, _encoding))
     for definition in definitions:
         lexer = Lexer(definition)
         parser = Parser(lexer)
@@ -26,8 +26,8 @@ def process_file(file_path):
         xml = convert(structure)
         file_name = os.path.splitext(os.path.basename(file_path))[0] + '-' + structure.name + '.xml'
         dir_name = _output_directory if _output_directory else os.path.dirname(file_path)
-
-    # TODO: parse and convert to xml (not implemented atm)
+        with open(os.path.join(dir_name, file_name), 'rb+') as f:
+            f.write(xml)
     print("Done.")
 
 
@@ -69,10 +69,3 @@ for arg in args:
         process_file(arg)
     else:
         print("Wrong argument: '" + arg + "'! Skipping...")
-
-
-
-
-
-
-
