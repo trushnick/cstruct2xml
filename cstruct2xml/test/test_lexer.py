@@ -39,7 +39,7 @@ class TestLexer(unittest.TestCase):
         """
         with self.assertRaises(LexerError):
             lexer = Lexer(testcase)
-            lexemes = list(lexer)
+            list(lexer)
 
     def test_position(self):
         testcase = """
@@ -60,8 +60,11 @@ class TestLexer(unittest.TestCase):
         next(iterator)
         next(iterator)
         next(iterator)
-        self.assertEqual((lexer.line_number, lexer.line_pos), (3,26))
+        self.assertEqual((lexer.line_number, lexer.line_pos), (3, 26))
         next(iterator)
         next(iterator)
         next(iterator)
-        self.assertEqual((lexer.line_number, lexer.line_pos), (4,21))
+        self.assertEqual((lexer.line_number, lexer.line_pos), (4, 21))
+        next(iterator)
+        next(iterator)
+        self.assertEqual((lexer.line_number, lexer.line_pos), (5, 21))
