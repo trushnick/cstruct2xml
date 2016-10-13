@@ -24,7 +24,6 @@ class TestParser(unittest.TestCase):
         lexer = Lexer(testcase)
         parser = Parser(lexer)
         structure = parser.parse()
-        print(structure)
         self.assertEqual(structure.name, "StructName")
         self.assertEqual(structure.description, "comment")
         self.assertEqual(len(structure.variables), 5)
