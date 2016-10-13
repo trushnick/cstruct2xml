@@ -16,7 +16,7 @@ class Extractor:
             with open(path, 'rb') as f:
                 self.content = f.read().decode(self.encoding)
         else:
-            raise ExtractorError
+            raise ExtractorError("No such file")
 
     def __iter__(self):
         definition = self._next_def()
@@ -25,7 +25,7 @@ class Extractor:
             definition = self._next_def()
 
     def _next_def(self):
-        match = self._pattern.match(self.content, self.pos)
+        match = self._pattern.search(self.content, self.pos)
         if match:
             pos = match.end()
             counter = 1
@@ -44,4 +44,6 @@ class Extractor:
 
 
 class ExtractorError(Exception):
-    pass
+
+    def __init__(self, msg):
+        super(ExtractorError, self).__init__(msg)
