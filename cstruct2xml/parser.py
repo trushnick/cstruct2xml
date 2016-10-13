@@ -10,9 +10,6 @@ class Structure:
         self.description = ''
         self.variables = []
 
-    def add_variable(self, variable):
-        self.variables.append(variable)
-
 
 class Variable:
 
@@ -27,7 +24,8 @@ class Parser:
 
     def __init__(self, lexer):
         self.lexer = lexer
-        self.current = next(lexer)
+        self.lexer_iter = iter(lexer)
+        self.current = next(self.lexer_iter)
         self.structure = Structure()
         self.current_var = None
 
@@ -43,8 +41,16 @@ class Parser:
         self._struct_body(self.structure)
         self._match(TokenType.RCB)
         self.structure.name = self._struct_name()
-        self._match(TokenType.SC)
-        return self.structure
+        try:
+            self._match(TokenType.SC)
+        except ParserError as e:
+            if e.message.startswith("Wrong"):
+                raise e
+            else:
+                return self.structure
+        else:
+            raise ParserError("End of lexemes expected, but {} found".format(
+                self.current))
 
     def _comment_block(self):
         # comment_block -> comment_block comment | comment | %empty%
@@ -57,7 +63,7 @@ class Parser:
             else:
                 comment = comment.strip()
             comment_block += '\n' + comment
-            self.current = next(self.lexer)
+            self.current = next(self.lexer_iter)
         return comment_block.strip()
 
     def _struct_body(self, structure):
@@ -68,7 +74,7 @@ class Parser:
         # struct_body2->    struct_member struct_body2 | %empty%
         current_var = self._struct_member()
         structure.variables.append(current_var)
-        while self.current.type not in [TokenType.RCB]:
+        while self.current.type != TokenType.RCB:
             current_var = self._struct_member()
             structure.variables.append(current_var)
 
@@ -81,7 +87,6 @@ class Parser:
             variable.value.description = description
         else:
             variable = self._var_decl()
-            variable.value.description = description
         variable.description = description
         return variable
 
@@ -95,6 +100,10 @@ class Parser:
         # place of comment block, already read outside this function, so no need to read again  
         self._match(TokenType.STRUCT)
         self._match(TokenType.LCB)
+        self._struct_body(current_var.value)
+        self._match(TokenType.RCB)
+        current_var.name = self._match(TokenType.VARIABLE_NAME).value
+        self._match(TokenType.SC)
         return current_var
 
     def _var_decl(self):
@@ -109,7 +118,8 @@ class Parser:
         #             var_type VARIABLE_NAME array_specifier SC
         spec = (self._var_type(),
                 self._match(TokenType.VARIABLE_NAME).value,
-                1 if self.current.type == TokenType.SC else self._array_size_expr())
+                1 if self.current.type == TokenType.SC 
+                    else self._array_specifier())
         self._match(TokenType.SC)
         return spec
 
@@ -178,9 +188,11 @@ class Parser:
         return ' '.join(var_type)
 
     def _array_specifier(self):
+        # array_specifier ->    LSB array_size_expr RSB
         self._match(TokenType.LSB)
-        self._array_size_expr()
+        expr = self._array_size_expr()
         self._match(TokenType.RSB)
+        return expr
 
     def _array_size_expr(self):
         # array_size_expr ->    array_size_expr2 PLUS array_size_expr |
@@ -193,6 +205,7 @@ class Parser:
             else:
                 expr += self._match(TokenType.MINUS).value
             expr += self._array_size_expr()
+        return expr
 
     def _array_size_expr2(self):
         # array_size_expr2 ->    array_size_expr3 MUL array_size_expr2 |
@@ -226,18 +239,24 @@ class Parser:
         t = self._match(TokenType.VARIABLE_NAME)
         return t.value
 
-    def _match(self, types):
+    def _match(self, type):
         # TODO: reconsider, maybe return token.value instead of token? (check usages)
-        if self.current.type in types:
+        if self.current.type == type:
             token = self.current
-            self.current = next(self.lexer)
+            try:
+                self.current = next(self.lexer_iter)
+            except StopIteration:
+                raise ParserError("{} expected, but end of lexemes found".format(type))
             return token
         else:
-            raise ParserError(self.current, self.lexer.line_number, self.lexer.line_pos)
+            message = "Wrong lexeme {} at line {}, pos {}. {} expected".format(
+                self.current, self.lexer.line_number, self.lexer.line_pos, type)
+            raise ParserError(message)
 
 
 class ParserError(Exception):
 
-    def __init__(self, token, line_number, line_pos):
-        message = 'Wrong lexeme: {} at line {}, pos {}'.format(token, line_number, line_pos)
+    def __init__(self, message="Unknown message"):
+        self.message = message
         super(ParserError, self).__init__(message)
+

@@ -17,14 +17,14 @@ class TestLexer(unittest.TestCase):
                     long double c;
                 }
                 signed short d[123];
-                unsigned char e;
+                unsigned char e[123 * (2 - 4) + 3 / 4 - a];
             } StructName;
         """
         lexer = Lexer(testcase)
         lexemes = list(lexer)
         for lexeme in lexemes:
             print(lexeme)
-        self.assertEqual(len(lexemes), 32)
+        self.assertEqual(len(lexemes), 47)
 
     def test_with_error(self):
         testcase = """

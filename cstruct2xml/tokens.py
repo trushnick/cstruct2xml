@@ -34,8 +34,15 @@ class TokenType(Enum):
     LONG = r'long'
     SHORT = r'short'
 
-    VARIABLE_NAME = r'\w+'
+    PLUS = r'\+'
+    MINUS = r'\-'
+    MUL = r'\*'
+    DIV = r'/'
+
     NUMBER = r'[1-9][0-9]*'
+    VARIABLE_NAME = r'\w+'
+    LB = r'\('
+    RB = r'\)'
     LCB = r'\{'
     RCB = r'\}'
     LSB = r'\['
