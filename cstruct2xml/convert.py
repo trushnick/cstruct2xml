@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from xml.etree import ElementTree as ET
+import lxml.etree as ET
 from xml.dom import minidom
 
 
@@ -61,5 +61,5 @@ def _convert_variable(variable):
 
 
 def _prettify(top_element):
-    xml = ET.tostring(top_element, 'utf-8')
+    xml = ET.tostring(top_element)
     return minidom.parseString(xml).toprettyxml(indent='  ')
