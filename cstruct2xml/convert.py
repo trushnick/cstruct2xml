@@ -4,6 +4,12 @@ from xml.etree import ElementTree as ET
 from xml.dom import minidom
 
 
+def convert_file(name, structures):
+    file = ET.Element('file', {'name':name})
+    for structure in structures:
+        file.append(_convert_structure(structure))
+    return _prettify(file)
+
 def convert(structure):
     return _prettify(_convert_structure(structure))
 

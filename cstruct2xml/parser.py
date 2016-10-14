@@ -102,7 +102,7 @@ class Parser:
         self._match(TokenType.LCB)
         self._struct_body(current_var.value)
         self._match(TokenType.RCB)
-        current_var.name = self._match(TokenType.VARIABLE_NAME).value
+        current_var.name = current_var.value.name = self._match(TokenType.VARIABLE_NAME).value
         self._match(TokenType.SC)
         return current_var
 

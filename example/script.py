@@ -17,17 +17,26 @@ def process_dir(dir_path):
 
 
 def process_file(file_path):
-    print("Processing: " + file_path + "... ", end='')
+    print("Processing: " + file_path + "...", end=' ')
     definitions = list(Extractor(file_path, _encoding))
+    original_file_name = os.path.splitext(os.path.basename(file_path))[0]    
+    structures = []
     for definition in definitions:
         lexer = Lexer(definition)
         parser = Parser(lexer)
         structure = parser.parse()
+        structures.append(structure)
         xml = convert(structure)
-        file_name = os.path.splitext(os.path.basename(file_path))[0] + '-' + structure.name + '.xml'
-        dir_name = _output_directory if _output_directory else os.path.dirname(file_path)
-        with open(os.path.join(dir_name, file_name), 'rb+') as f:
-            f.write(xml)
+        file_name = original_file_name + '-' + structure.name + '.xml'
+        dir_name = _output_directory if _output_directory else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
+        with open(os.path.join(dir_name, file_name), 'wb+') as f:
+            f.write(xml.encode(_encoding))
+    file_name = original_file_name + '.xml'
+    xml = convert_file(original_file_name, structures)
+    with open(os.path.join(dir_name, file_name), 'wb+') as f:
+        f.write(xml.encode(_encoding))
     print("Done.")
 
 
@@ -54,10 +63,10 @@ if options.directory is not None:
         print("Directory '" + options.directory + "' doesn't exists")
         exit(1)
     _output_directory = options.directory
-else:
     _output_directory = 'DEFAULT ([file-dir]/cstruct2xml-output/)'
 print("Using encoding: " + _encoding)
-print("Using output directory: " + _output_directory)
+print("Using output directory: " + 
+        _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
 print("Converting files: " + str(args))
 if len(args) == 0:
     print("No files provided, exiting.")
