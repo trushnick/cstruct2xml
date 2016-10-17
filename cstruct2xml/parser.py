@@ -6,8 +6,8 @@ from .tokens import TokenType
 class Structure:
 
     def __init__(self):
-        self.name = ''
-        self.description = ''
+        self.name = None
+        self.description = None
         self.variables = []
 
 
@@ -33,14 +33,22 @@ class Parser:
         return self._struct_def()
 
     def _struct_def(self):
-        # struct_def -> comment_block TYPEDEF STRUCT LCB struct_body RCB struct_name SC
+        # struct_def -> comment_block TYPEDEF? STRUCT struct_name1? LCB struct_body RCB struct_name SC
         self.structure.description = self._comment_block()
-        self._match(TokenType.TYPEDEF)
+        if self.current.type == TokenType.TYPEDEF:
+            self._match(TokenType.TYPEDEF)
         self._match(TokenType.STRUCT)
+        if self.current.type == TokenType.VARIABLE_NAME:
+            self.structure.name = self._match(TokenType.VARIABLE_NAME)
+        self._comment_block()  # Skipping comments before opening bracket
         self._match(TokenType.LCB)
         self._struct_body(self.structure)
+        self._comment_block()  # Skipping comment before closing bracket
         self._match(TokenType.RCB)
-        self.structure.name = self._struct_name()
+        if not self.structure.name:
+            self.structure.name = self._struct_name()
+        else:
+            self._struct_name()
         try:
             self._match(TokenType.SC)
         except ParserError as e:
@@ -99,10 +107,12 @@ class Parser:
         current_var.value = Structure()
         # place of comment block, already read outside this function, so no need to read again  
         self._match(TokenType.STRUCT)
+        self._comment_block()  # Skipping comment block before opening bracket
         self._match(TokenType.LCB)
         self._struct_body(current_var.value)
+        self._comment_block()  # Skipping comment block before closing bracket
         self._match(TokenType.RCB)
-        current_var.name = current_var.value.name = self._match(TokenType.VARIABLE_NAME).value
+        current_var.name = current_var.value.name = self._match(TokenType.VARIABLE_NAME)
         self._match(TokenType.SC)
         return current_var
 
@@ -117,7 +127,7 @@ class Parser:
         # var_spec -> var_type VARIABLE_NAME SC |
         #             var_type VARIABLE_NAME array_specifier SC
         spec = (self._var_type(),
-                self._match(TokenType.VARIABLE_NAME).value,
+                self._match(TokenType.VARIABLE_NAME),
                 1 if self.current.type == TokenType.SC 
                     else self._array_specifier())
         self._match(TokenType.SC)
@@ -128,8 +138,7 @@ class Parser:
         #                users_type
         # users_type -> VARIABLE_NAME
         if self.current.type == TokenType.VARIABLE_NAME:
-            t = self._match(TokenType.VARIABLE_NAME)
-            var_type = t.value
+            var_type = self._match(TokenType.VARIABLE_NAME)
         else:
             var_type = self._prim_type()
         return var_type
@@ -150,41 +159,41 @@ class Parser:
         var_type = []
         if self.current.type in [TokenType.UNSIGNED, TokenType.SIGNED]:
             if self.current.type == TokenType.SIGNED:
-                var_type.append(self._match(TokenType.SIGNED).value)
+                var_type.append(self._match(TokenType.SIGNED))
             else:
-                var_type.append(self._match(TokenType.UNSIGNED).value)
+                var_type.append(self._match(TokenType.UNSIGNED))
             if self.current.type == TokenType.CHAR:
-                var_type.append(self._match(TokenType.CHAR).value)
+                var_type.append(self._match(TokenType.CHAR))
             elif self.current.type in [TokenType.SHORT, TokenType.LONG]:
                 if self.current.type == TokenType.SHORT:
-                    var_type.append(self._match(TokenType.SHORT).value)
+                    var_type.append(self._match(TokenType.SHORT))
                 else:
-                    var_type.append(self._match(TokenType.LONG).value)
+                    var_type.append(self._match(TokenType.LONG))
                     if self.current.type == TokenType.LONG:
-                        var_type.append(self._match(TokenType.LONG).value)
+                        var_type.append(self._match(TokenType.LONG))
                 if self.current.type == TokenType.INT:
-                    var_type.append(self._match(TokenType.INT).value)
+                    var_type.append(self._match(TokenType.INT))
             elif self.current.type == TokenType.INT:
-                var_type.append(self._match(TokenType.INT).value)
+                var_type.append(self._match(TokenType.INT))
         elif self.current.type in [TokenType.SHORT, TokenType.LONG]:
             if self.current.type == TokenType.SHORT:
-                var_type.append(self._match(TokenType.SHORT).value)
+                var_type.append(self._match(TokenType.SHORT))
             else:
-                var_type.append(self._match(TokenType.LONG).value)
+                var_type.append(self._match(TokenType.LONG))
                 if self.current.type == TokenType.LONG:
-                    var_type.append(self._match(TokenType.LONG).value)
+                    var_type.append(self._match(TokenType.LONG))
                 elif self.current.type == TokenType.DOUBLE:
-                    var_type.append(self._match(TokenType.DOUBLE).value)
+                    var_type.append(self._match(TokenType.DOUBLE))
             if self.current.type == TokenType.INT:
-                var_type.append(self._match(TokenType.INT).value)
+                var_type.append(self._match(TokenType.INT))
         elif self.current.type == TokenType.INT:
-            var_type.append(self._match(TokenType.INT).value)
+            var_type.append(self._match(TokenType.INT))
         elif self.current.type == TokenType.FLOAT:
-            var_type.append(self._match(TokenType.FLOAT).value)
+            var_type.append(self._match(TokenType.FLOAT))
         elif self.current.type == TokenType.DOUBLE:
-            var_type.append(self._match(TokenType.DOUBLE).value)
+            var_type.append(self._match(TokenType.DOUBLE))
         else:
-            var_type.append(self._match(TokenType.CHAR).value)
+            var_type.append(self._match(TokenType.CHAR))
         return ' '.join(var_type)
 
     def _array_specifier(self):
@@ -201,9 +210,9 @@ class Parser:
         expr = self._array_size_expr2()
         if self.current.type in [TokenType.PLUS, TokenType.MINUS]:
             if self.current.type == TokenType.PLUS:
-                expr += self._match(TokenType.PLUS).value
+                expr += self._match(TokenType.PLUS)
             else:
-                expr += self._match(TokenType.MINUS).value
+                expr += self._match(TokenType.MINUS)
             expr += self._array_size_expr()
         return expr
 
@@ -214,9 +223,9 @@ class Parser:
         expr = self._array_size_expr3()
         if self.current.type in [TokenType.DIV, TokenType.MUL]:
             if self.current.type == TokenType.MUL:
-                expr += self._match(TokenType.MUL).value
+                expr += self._match(TokenType.MUL)
             else:
-                expr += self._match(TokenType.DIV).value
+                expr += self._match(TokenType.DIV)
             expr += self._array_size_expr2()
         return expr
 
@@ -225,19 +234,18 @@ class Parser:
         #                        NUMBER |
         #                        VARIABLE_NAME
         if self.current.type == TokenType.NUMBER:
-            expr = self._match(TokenType.NUMBER).value
+            expr = self._match(TokenType.NUMBER)
         elif self.current.type == TokenType.VARIABLE_NAME:
-            expr = self._match(TokenType.VARIABLE_NAME).value
+            expr = self._match(TokenType.VARIABLE_NAME)
         else:
-            expr = self._match(TokenType.LB).value
+            expr = self._match(TokenType.LB)
             expr += self._array_size_expr()
-            expr += self._match(TokenType.RB).value
+            expr += self._match(TokenType.RB)
         return expr
 
     def _struct_name(self):
         # struct_name -> VARIABLE_NAME
-        t = self._match(TokenType.VARIABLE_NAME)
-        return t.value
+        return self._match(TokenType.VARIABLE_NAME)
 
     def _match(self, type):
         # TODO: reconsider, maybe return token.value instead of token? (check usages)
@@ -247,7 +255,7 @@ class Parser:
                 self.current = next(self.lexer_iter)
             except StopIteration:
                 raise ParserError("{} expected, but end of lexemes found".format(type))
-            return token
+            return token.value
         else:
             message = "Wrong lexeme {} at line {}, pos {}. {} expected".format(
                 self.current, self.lexer.line_number, self.lexer.line_pos, type)

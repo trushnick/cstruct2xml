@@ -17,7 +17,7 @@ def process_dir(dir_path):
 
 
 def process_file(file_path):
-    print("Processing: " + file_path + "...", end=' ')
+    print("Processing: " + file_path + "...")
     definitions = list(Extractor(file_path, _encoding))
     original_file_name = os.path.splitext(os.path.basename(file_path))[0]    
     structures = []
@@ -29,6 +29,7 @@ def process_file(file_path):
         lexer = Lexer(definition)
         parser = Parser(lexer)
         structure = parser.parse()
+        print("Found structure named {}".format(structure.name))
         structures.append(structure)
         if not _one_output_per_file:
             xml = convert(structure)
@@ -51,8 +52,6 @@ opt_parser.add_option('-e', '--enc', dest='encoding',
                       help='Use specific encoding for files. Default is utf-8.', metavar='ENC')
 opt_parser.add_option('-d', dest='directory',
                       help='Output XML-file to specific directory.', metavar='DIR')
-opt_parser.add_option('-t', dest='threads',
-                      help='Number of threads that will run', metavar='THREADS')
 opt_parser.add_option('--file-only', action='store_true', dest='file_only', default=False,
                       help='Generate only one xml per file')
 options, args = opt_parser.parse_args()

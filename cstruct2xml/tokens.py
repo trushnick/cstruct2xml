@@ -13,7 +13,7 @@ class Token:
         return len(self.value)
 
     def __str__(self):
-        return "<Token:: type:{}, value:{}".format(self.type, repr(self.value))
+        return "<Token:: type:{}, value:{}>".format(self.type, repr(self.value))
 
 
 class TokenType(Enum):
@@ -21,7 +21,7 @@ class TokenType(Enum):
     WHITESPACE = r'\s+'
 
     END_OF_LINE_COMMENT = r'//[^\n]*\n'
-    TRADITIONAL_COMMENT = r'/\*([^\*]|\*+[^/])*\*+/' # TODO: Is there a better solution than \** for multiple * in the end of comment?
+    TRADITIONAL_COMMENT = r'/\*([^\*]|\*+[^/])*\*+/'
 
     TYPEDEF = r'typedef'
     STRUCT = r'struct'
