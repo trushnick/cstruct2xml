@@ -21,27 +21,31 @@ def process_file(file_path):
     definitions = list(Extractor(file_path, _encoding))
     original_file_name = os.path.splitext(os.path.basename(file_path))[0]    
     structures = []
+    root_dir_name = _output_directory if _output_directory \
+                    else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
+    if not os.path.exists(root_dir_name):
+        os.mkdir(root_dir_name)
     for definition in definitions:
         lexer = Lexer(definition)
         parser = Parser(lexer)
         structure = parser.parse()
         structures.append(structure)
-        xml = convert(structure)
-        file_name = original_file_name + '-' + structure.name + '.xml'
-        dir_name = _output_directory if _output_directory else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
-        if not os.path.exists(dir_name):
-            os.mkdir(dir_name)
-        with open(os.path.join(dir_name, file_name), 'wb+') as f:
-            f.write(xml.encode(_encoding))
-    file_name = original_file_name + '.xml'
+        if not _one_output_per_file:
+            xml = convert(structure)
+            dir_name = os.path.join(root_dir_name, original_file_name)
+            if not os.path.exists(dir_name):
+                os.mkdir(dir_name)
+            with open(os.path.join(dir_name, structure.name + '.xml'), 'w', encoding=_encoding) as f:
+                f.write(xml)
     xml = convert_file(original_file_name, structures)
-    with open(os.path.join(dir_name, file_name), 'wb+') as f:
-        f.write(xml.encode(_encoding))
+    with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
+        f.write(xml)
     print("Done.")
 
 
 _encoding = 'utf-8'
 _output_directory = ''
+_one_output_per_file = False
 opt_parser = optparse.OptionParser()
 opt_parser.add_option('-e', '--enc', dest='encoding',
                       help='Use specific encoding for files. Default is utf-8.', metavar='ENC')
@@ -49,8 +53,10 @@ opt_parser.add_option('-d', dest='directory',
                       help='Output XML-file to specific directory.', metavar='DIR')
 opt_parser.add_option('-t', dest='threads',
                       help='Number of threads that will run', metavar='THREADS')
+opt_parser.add_option('--file-only', action='store_true', dest='file_only', default=False,
+                      help='Generate only one xml per file')
 options, args = opt_parser.parse_args()
-if options.encoding is not None:
+if options.encoding:
     try:
         codecs.lookup(options.encoding)
     except LookupError:
@@ -58,16 +64,24 @@ if options.encoding is not None:
         print(opt_parser.usage)
         exit(1)
     _encoding = options.encoding
-if options.directory is not None:
+if options.directory:
     if not os.path.isdir(options.directory):
         print("Directory '" + options.directory + "' doesn't exists")
         exit(1)
     _output_directory = options.directory
     _output_directory = 'DEFAULT ([file-dir]/cstruct2xml-output/)'
+if options.file_only:
+    _one_output_per_file = True
+
 print("Using encoding: " + _encoding)
 print("Using output directory: " + 
         _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
 print("Converting files: " + str(args))
+if _one_output_per_file:
+    print("Generating one output xml per file")
+else:
+    print("Generating xml file for each structure + overall for file")
+
 if len(args) == 0:
     print("No files provided, exiting.")
     exit(0)

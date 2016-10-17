@@ -61,5 +61,4 @@ def _convert_variable(variable):
 
 
 def _prettify(top_element):
-    xml = ET.tostring(top_element)
-    return minidom.parseString(xml).toprettyxml(indent='  ')
+    return ET.tostring(top_element, encoding='unicode', pretty_print=True)

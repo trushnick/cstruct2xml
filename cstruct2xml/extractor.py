@@ -7,8 +7,8 @@ import os
 class Extractor:
 
     def __init__(self, path, encoding='utf-8'):
-        self._pattern = re.compile(r'(?:(?:(?://[^\n]*\n)|(?:/\*(?:[^*]|(?:\*[^/]))*\*/))\s*)*'
-                                   r'typedef\s+struct\s+(?:[\w_][\w\d_]*)?\s*\{')
+        self._pattern = re.compile(r'(?:(?:(?://[^\n]*\n)|(?:/\*(?:[^*]|(?:\*+[^/]))*\*+/))\s*)*'
+                                   r'(?:typedef)?\s+struct\s+(?:\w+)?\s*\{')
         self.path = path
         self.encoding = encoding
         self.pos = 0
