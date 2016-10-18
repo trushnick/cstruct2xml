@@ -3,6 +3,10 @@
 from .tokens import TokenType
 
 
+_sign_mods = [TokenType.SIGNED, TokenType.UNSIGNED]
+_size_mods = [TokenType.SHORT, TokenType.LONG]
+
+
 class Structure:
 
     def __init__(self):
@@ -134,7 +138,7 @@ class Parser:
         #             var_type VARIABLE_NAME array_specifier SC
         spec = (self._var_type(),
                 self._match(TokenType.VARIABLE_NAME),
-                1 if self.current.type == TokenType.SC 
+                1 if self.current.type == TokenType.SC
                     else self._array_specifier())
         self._match(TokenType.SC)
         return spec
@@ -163,43 +167,33 @@ class Parser:
         # float_type ->    FLOAT | DOUBLE | LONG DOUBLE
         # TODO: REFACTOR, code duplicates
         var_type = []
-        if self.current.type in [TokenType.UNSIGNED, TokenType.SIGNED]:
-            if self.current.type == TokenType.SIGNED:
-                var_type.append(self._match(TokenType.SIGNED))
-            else:
-                var_type.append(self._match(TokenType.UNSIGNED))
-            if self.current.type == TokenType.CHAR:
-                var_type.append(self._match(TokenType.CHAR))
-            elif self.current.type in [TokenType.SHORT, TokenType.LONG]:
-                if self.current.type == TokenType.SHORT:
-                    var_type.append(self._match(TokenType.SHORT))
-                else:
-                    var_type.append(self._match(TokenType.LONG))
-                    if self.current.type == TokenType.LONG:
-                        var_type.append(self._match(TokenType.LONG))
-                if self.current.type == TokenType.INT:
-                    var_type.append(self._match(TokenType.INT))
-            elif self.current.type == TokenType.INT:
-                var_type.append(self._match(TokenType.INT))
-        elif self.current.type in [TokenType.SHORT, TokenType.LONG]:
-            if self.current.type == TokenType.SHORT:
-                var_type.append(self._match(TokenType.SHORT))
-            else:
-                var_type.append(self._match(TokenType.LONG))
-                if self.current.type == TokenType.LONG:
-                    var_type.append(self._match(TokenType.LONG))
-                elif self.current.type == TokenType.DOUBLE:
-                    var_type.append(self._match(TokenType.DOUBLE))
-            if self.current.type == TokenType.INT:
-                var_type.append(self._match(TokenType.INT))
-        elif self.current.type == TokenType.INT:
-            var_type.append(self._match(TokenType.INT))
+        if self.current.type == TokenType.DOUBLE:
+            var_type.append(self._match(TokenType.DOUBLE))
         elif self.current.type == TokenType.FLOAT:
             var_type.append(self._match(TokenType.FLOAT))
-        elif self.current.type == TokenType.DOUBLE:
-            var_type.append(self._match(TokenType.DOUBLE))
         else:
-            var_type.append(self._match(TokenType.CHAR))
+            if self.current.type in _sign_mods:
+                if self.current.type == TokenType.SIGNED:
+                    var_type.append(self._match(TokenType.SIGNED))
+                else:
+                    var_type.append(self._match(TokenType.UNSIGNED))
+            if self.current.type == TokenType.CHAR:
+                var_type.append(self._match(TokenType.CHAR))
+            else:
+                if self.current.type in _size_mods:
+                    if self.current.type == TokenType.SHORT:
+                        var_type.append(self._match(TokenType.SHORT))
+                    else:
+                        var_type.append(self._match(TokenType.LONG))
+                        if self.current.type == TokenType.LONG:
+                            var_type.append(self._match(TokenType.LONG))
+                        elif self.current.type == TokenType.DOUBLE:
+                            var_type.append(self._match(TokenType.DOUBLE))
+                            return ' '.join(var_type)  # Returning earlier because it's specific 
+                if self.current.type == TokenType.INT:
+                    var_type.append(self._match(TokenType.INT))
+
+
         return ' '.join(var_type)
 
     def _array_specifier(self):
@@ -254,7 +248,6 @@ class Parser:
         return self._match(TokenType.VARIABLE_NAME)
 
     def _match(self, type):
-        # TODO: reconsider, maybe return token.value instead of token? (check usages)
         if self.current.type == type:
             token = self.current
             try:
