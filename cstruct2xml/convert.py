@@ -14,7 +14,7 @@ def convert(structure):
     return _prettify(_convert_structure(structure))
 
 
-def _convert_structure(structure):
+def _convert_structure(structure, count = 0):
     struct = ET.Element('structure')
     
     name = ET.Element('name')
@@ -22,6 +22,10 @@ def _convert_structure(structure):
 
     description = ET.Element('description')    
     description.text = structure.description
+
+    if count:
+        array_size = ET.Element('array_size')
+        array_size.text = count
     
     variables = ET.Element('variables')
     for v in structure.variables:
@@ -31,13 +35,15 @@ def _convert_structure(structure):
     struct.append(name)
     struct.append(description)
     struct.append(variables)
+    if count:
+        struct.append(array_size)
     
     return struct
 
 
 def _convert_variable(variable):
     if variable.type == 'struct':
-        var_el = _convert_structure(variable.value)
+        var_el = _convert_structure(variable.value, variable.array_size)
     else:
         var_el = ET.Element('variable')
         
