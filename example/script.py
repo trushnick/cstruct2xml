@@ -28,16 +28,22 @@ def process_file(file_path):
     for definition in definitions:
         lexer = Lexer(definition)
         parser = Parser(lexer)
-        structure = parser.parse()
-        print("Found structure named {}".format(structure.name))
-        structures.append(structure)
-        if not _one_output_per_file:
-            xml = convert(structure)
-            dir_name = os.path.join(root_dir_name, original_file_name)
-            if not os.path.exists(dir_name):
-                os.mkdir(dir_name)
-            with open(os.path.join(dir_name, structure.name + '.xml'), 'w', encoding=_encoding) as f:
-                f.write(xml)
+        try:
+            structure = parser.parse()
+        except ParserError as e:
+            print("Coudln't parse structure {}.\nError message:{}".format(
+                    parser.structure.name if parser.structure.name else '%no_name%',
+                    e.message))
+        else:
+            print("Found structure named {}".format(structure.name))
+            structures.append(structure)
+            if not _one_output_per_file:
+                xml = convert(structure)
+                dir_name = os.path.join(root_dir_name, original_file_name)
+                if not os.path.exists(dir_name):
+                    os.mkdir(dir_name)
+                with open(os.path.join(dir_name, structure.name + '.xml'), 'w', encoding=_encoding) as f:
+                    f.write(xml)
     xml = convert_file(original_file_name, structures)
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
         f.write(xml)

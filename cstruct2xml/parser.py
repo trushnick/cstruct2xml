@@ -80,22 +80,32 @@ class Parser:
         # Getting rid of left recursion:
         # struct_body ->    struct_member struct_body2
         # struct_body2->    struct_member struct_body2 | %empty%
+        description = self._comment_block()
         current_var = self._struct_member()
+        current_var.description = description
+        if current_var.type == 'struct':
+            curent_var.value.description = description
         structure.variables.append(current_var)
         while self.current.type != TokenType.RCB:
+            description = self._comment_block()
+            if self.current.type == TokenType.RCB:
+                break
             current_var = self._struct_member()
+            current_var.description = description
+            if current_var.type == 'struct':
+                current_var.value.description = description
             structure.variables.append(current_var)
 
     def _struct_member(self):
         # struct_member ->  inner_struct_def |
         #                   var_decl
-        description = self._comment_block()
+        #description = self._comment_block()
         if self.current.type == TokenType.STRUCT:
             variable = self._inner_struct_def()
-            variable.value.description = description
+            #variable.value.description = description
         else:
             variable = self._var_decl()
-        variable.description = description
+        #variable.description = description
         return variable
 
     def _inner_struct_def(self):
@@ -103,16 +113,19 @@ class Parser:
         # comment_block read in struct_member()
         current_var = Variable()
         current_var.type = 'struct'
-        current_var.array_size = 1
         current_var.value = Structure()
         # place of comment block, already read outside this function, so no need to read again  
         self._match(TokenType.STRUCT)
+        if self.current.type == TokenType.VARIABLE_NAME:
+            current_var.value.name = self._match(TokenType.VARIABLE_NAME)
         self._comment_block()  # Skipping comment block before opening bracket
         self._match(TokenType.LCB)
         self._struct_body(current_var.value)
         self._comment_block()  # Skipping comment block before closing bracket
         self._match(TokenType.RCB)
         current_var.name = current_var.value.name = self._match(TokenType.VARIABLE_NAME)
+        current_var.array_size = 1 if self.current.type != TokenType.LSB \
+                                   else self._array_specifier()
         self._match(TokenType.SC)
         return current_var
 
