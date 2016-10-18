@@ -80,32 +80,25 @@ class Parser:
         # Getting rid of left recursion:
         # struct_body ->    struct_member struct_body2
         # struct_body2->    struct_member struct_body2 | %empty%
-        description = self._comment_block()
         current_var = self._struct_member()
-        current_var.description = description
-        if current_var.type == 'struct':
-            curent_var.value.description = description
-        structure.variables.append(current_var)
-        while self.current.type != TokenType.RCB:
-            description = self._comment_block()
-            if self.current.type == TokenType.RCB:
-                break
+        while self.current.type != TokenType.RCB and current_var is not None:
+            structure.variables.append(current_var)
             current_var = self._struct_member()
-            current_var.description = description
-            if current_var.type == 'struct':
-                current_var.value.description = description
+        if current_var is not None:
             structure.variables.append(current_var)
 
     def _struct_member(self):
         # struct_member ->  inner_struct_def |
         #                   var_decl
-        #description = self._comment_block()
-        if self.current.type == TokenType.STRUCT:
+        description = self._comment_block()
+        if self.current.type == TokenType.RCB:  # Comment block before closing bracket of structure
+            return None
+        elif self.current.type == TokenType.STRUCT:
             variable = self._inner_struct_def()
-            #variable.value.description = description
+            variable.value.description = description
         else:
             variable = self._var_decl()
-        #variable.description = description
+        variable.description = description
         return variable
 
     def _inner_struct_def(self):

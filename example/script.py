@@ -31,7 +31,7 @@ def process_file(file_path):
         try:
             structure = parser.parse()
         except ParserError as e:
-            print("Coudln't parse structure {}.\nError message:{}".format(
+            print("Coudln't parse structure {}.\nError message: {}".format(
                     parser.structure.name if parser.structure.name else '%no_name%',
                     e.message))
         else:
