@@ -58,7 +58,7 @@ class TestParser(unittest.TestCase):
                 /* some "multiline" comment */
                 struct {
                     long double c;
-                } inner_struct_name;
+                } inner_struct_name[5];
                 signed short d[123];
                 unsigned char e;
             }
@@ -66,10 +66,9 @@ class TestParser(unittest.TestCase):
         lexer = Lexer(testcase)
         parser = Parser(lexer)
         with self.assertRaises(ParserError) as context:
-            parser.parse();
+            parser.parse()
         exception = context.exception
-        self.assertFalse(exception.message.startswith('End of lexemes') or
-                            exception.message.startswith('Wrong lexeme'))
+        self.assertFalse(exception.message.startswith('End of lexemes') or exception.message.startswith('Wrong lexeme'))
 
     def test_end_expected_but_lexeme_found(self):
         testcase = """
@@ -92,3 +91,46 @@ class TestParser(unittest.TestCase):
             parser.parse()
         exception = context.exception
         self.assertTrue(exception.message.startswith('End of lexemes'))
+
+    def test_comment_before_bracket(self):
+        testcase = """
+        //comment
+        typedef struct // comment before opening bracket
+        {
+            int a;
+            unsigned long long int b;
+        /* comment
+            before
+            closing bracket */
+        } StructName;
+        """
+        lexer = Lexer(testcase)
+        parser = Parser(lexer)
+        structure = parser.parse()
+        self.assertIsNotNone(structure)
+
+    def test_multiple_names(self):
+        testcase = """
+        //comment
+        typedef struct StructName {
+            int foo;
+            float bar[MAX_SIZE];
+        } StructNameAlias;
+        """
+        lexer = Lexer(testcase)
+        parser = Parser(lexer)
+        structure = parser.parse()
+        self.assertEqual(structure.name, 'StructName')
+
+    def test_without_typedef(self):
+        testcase = """
+        //comment
+        struct FirstName {
+            int foo;
+            float bar[1];
+        } NameAlias;
+        """
+        lexer = Lexer(testcase)
+        parser = Parser(lexer)
+        structure = parser.parse()
+        self.assertIsNotNone(structure)

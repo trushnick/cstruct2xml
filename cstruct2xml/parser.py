@@ -2,9 +2,57 @@
 # -*- coding: utf-8 -*-
 from .tokens import TokenType
 
-
+# Sign mods for primitive int types
 _sign_mods = [TokenType.SIGNED, TokenType.UNSIGNED]
+# Size mods for primitive int types
 _size_mods = [TokenType.SHORT, TokenType.LONG]
+# Mapping between types in declaration and type group
+_type_groups = {
+    # Char types -> char
+    'char': 'char',
+    'signed char': 'char',
+    'unsigned char': 'char',
+    # Short types
+    # Signed -> short
+    # Unsigneds -> ushort
+    'short': 'short',
+    'short int': 'short',
+    'signed short': 'short',
+    'signed short int': 'short',
+    'unsigned short': 'ushort',
+    'unsigned short int': 'ushort',
+    # Ints
+    # Signed -> int
+    # Unsigned -> uint
+    'int': 'int',
+    'signed': 'int',
+    'signed int': 'int',
+    'unsigned': 'uint',
+    'unsigned int': 'uint',
+    # Longs
+    # Signed -> long
+    # Unsigned -> ulong
+    'long': 'long',
+    'long int': 'long',
+    'signed long': 'long',
+    'signed long int': 'long',
+    'unsigned long': 'ulong',
+    'unsigned long int': 'ulong',
+    # Long longs
+    # Signed -> llong
+    # Unsigned -> ullong
+    'long long': 'llong',
+    'long long int': 'llong',
+    'signed long long': 'llong',
+    'signed long long int': 'llong',
+    'unsigned long long': 'ullong',
+    'unsigned long long int': 'ullong',
+    # Float
+    'float': 'float',
+    # Double, long double
+    'double': 'double',
+    'long double': 'ldouble'
+}
 
 
 class Structure:
@@ -111,7 +159,7 @@ class Parser:
         current_var = Variable()
         current_var.type = 'struct'
         current_var.value = Structure()
-        # place of comment block, already read outside this function, so no need to read again  
+        # place of comment block, already read outside this function, so no need to read again
         self._match(TokenType.STRUCT)
         if self.current.type == TokenType.VARIABLE_NAME:
             current_var.value.name = self._match(TokenType.VARIABLE_NAME)
@@ -121,8 +169,7 @@ class Parser:
         self._comment_block()  # Skipping comment block before closing bracket
         self._match(TokenType.RCB)
         current_var.name = current_var.value.name = self._match(TokenType.VARIABLE_NAME)
-        current_var.array_size = 1 if self.current.type != TokenType.LSB \
-                                   else self._array_specifier()
+        current_var.array_size = 1 if self.current.type != TokenType.LSB else self._array_specifier()
         self._match(TokenType.SC)
         return current_var
 
@@ -138,8 +185,7 @@ class Parser:
         #             var_type VARIABLE_NAME array_specifier SC
         spec = (self._var_type(),
                 self._match(TokenType.VARIABLE_NAME),
-                1 if self.current.type == TokenType.SC
-                    else self._array_specifier())
+                1 if self.current.type == TokenType.SC else self._array_specifier())
         self._match(TokenType.SC)
         return spec
 
@@ -189,12 +235,10 @@ class Parser:
                             var_type.append(self._match(TokenType.LONG))
                         elif self.current.type == TokenType.DOUBLE:
                             var_type.append(self._match(TokenType.DOUBLE))
-                            return ' '.join(var_type)  # Returning earlier because it's specific 
+                            return _type_groups[' '.join(var_type)]  # Returning earlier because it's specific
                 if self.current.type == TokenType.INT:
                     var_type.append(self._match(TokenType.INT))
-
-
-        return ' '.join(var_type)
+        return _type_groups[' '.join(var_type)]
 
     def _array_specifier(self):
         # array_specifier ->    LSB array_size_expr RSB
@@ -247,17 +291,17 @@ class Parser:
         # struct_name -> VARIABLE_NAME
         return self._match(TokenType.VARIABLE_NAME)
 
-    def _match(self, type):
-        if self.current.type == type:
+    def _match(self, ttype):
+        if self.current.type == ttype:
             token = self.current
             try:
                 self.current = next(self.lexer_iter)
             except StopIteration:
-                raise ParserError("{} expected, but end of lexemes found".format(type))
+                raise ParserError("{} expected, but end of lexemes found".format(ttype))
             return token.value
         else:
             message = "Wrong lexeme {} at line {}, pos {}. {} expected".format(
-                self.current, self.lexer.line_number, self.lexer.line_pos, type)
+                self.current, self.lexer.line_number, self.lexer.line_pos, ttype)
             raise ParserError(message)
 
 
@@ -266,4 +310,3 @@ class ParserError(Exception):
     def __init__(self, message="Unknown message"):
         self.message = message
         super(ParserError, self).__init__(message)
-
