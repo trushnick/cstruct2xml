@@ -3,7 +3,10 @@
 import optparse
 import os
 import codecs
-from cstruct2xml import *
+from cstruct2xml.extractor import Extractor
+from cstruct2xml.lexer import Lexer
+from cstruct2xml.parser import Parser, ParserError
+from cstruct2xml.convert import convert, convert_file
 
 
 def process_dir(dir_path):
