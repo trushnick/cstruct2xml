@@ -120,7 +120,7 @@ class TestParser(unittest.TestCase):
         lexer = Lexer(testcase)
         parser = Parser(lexer)
         structure = parser.parse()
-        self.assertEqual(structure.name, 'StructName')
+        self.assertEqual(structure.name, 'StructNameAlias')
 
     def test_without_typedef(self):
         testcase = """

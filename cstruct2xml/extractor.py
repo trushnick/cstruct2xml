@@ -6,9 +6,13 @@ import os
 
 class Extractor:
 
+    # Header of structure definition
+    _header_pattern = re.compile(r'(?:(?:(?://[^\n]*\n)|(?:/\*(?:[^*]|(?:\*+[^/]))*\*+/))\s*)*'
+                               r'(?:typedef)?\s+struct\s+(?:\w+)?\s*\{')
+    # Regex for #define
+    _define_pattern = re.compile(r'#define\s+(?P<token>\w+)\s+(?P<value>\w+)')
+
     def __init__(self, path, encoding='utf-8'):
-        self._pattern = re.compile(r'(?:(?:(?://[^\n]*\n)|(?:/\*(?:[^*]|(?:\*+[^/]))*\*+/))\s*)*'
-                                   r'(?:typedef)?\s+struct\s+(?:\w+)?\s*\{')
         self.path = path
         self.encoding = encoding
         self.pos = 0
@@ -25,7 +29,7 @@ class Extractor:
             definition = self._next_def()
 
     def _next_def(self):
-        match = self._pattern.search(self.content, self.pos)
+        match = self._header_pattern.search(self.content, self.pos)
         if match:
             pos = match.end()
             counter = 1
@@ -41,6 +45,16 @@ class Extractor:
             return self.content[match.start():pos + 1]
         else:
             return None
+
+    def defines(self):
+        pos = 0
+        define_dict = {}
+        match = self._define_pattern.search(self.content, pos)
+        while match:
+            define_dict[match.group('token')] = match.group('value')
+            pos = match.end()
+            match = self._define_pattern.search(self.content, pos)
+        return define_dict
 
 
 class ExtractorError(Exception):

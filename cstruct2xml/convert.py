@@ -16,17 +16,17 @@ def convert(structure):
 
 def _convert_structure(structure, count = 0):
     struct = ET.Element('structure')
-    
+
     name = ET.Element('name')
     name.text = structure.name
 
-    description = ET.Element('description')    
+    description = ET.Element('description')
     description.text = structure.description
 
     if count:
         array_size = ET.Element('array_size')
-        array_size.text = count
-    
+        array_size.text = str(count)
+
     variables = ET.Element('variables')
     for v in structure.variables:
         v_element = _convert_variable(v)
@@ -37,7 +37,7 @@ def _convert_structure(structure, count = 0):
     struct.append(variables)
     if count:
         struct.append(array_size)
-    
+
     return struct
 
 
@@ -46,10 +46,10 @@ def _convert_variable(variable):
         var_el = _convert_structure(variable.value, variable.array_size)
     else:
         var_el = ET.Element('variable')
-        
+
         name = ET.Element('name')
         name.text = variable.value
-        
+
         type = ET.Element('type')
         type.text = variable.type
 

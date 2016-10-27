@@ -86,21 +86,19 @@ class Parser:
 
     def _struct_def(self):
         # struct_def -> comment_block TYPEDEF? STRUCT struct_name1? LCB struct_body RCB struct_name SC
+        # Decided to use second name (alias) as structure name, for resolving
         self.structure.description = self._comment_block()
         if self.current.type == TokenType.TYPEDEF:
             self._match(TokenType.TYPEDEF)
         self._match(TokenType.STRUCT)
         if self.current.type == TokenType.VARIABLE_NAME:
-            self.structure.name = self._match(TokenType.VARIABLE_NAME)
+            self._match(TokenType.VARIABLE_NAME)
         self._comment_block()  # Skipping comments before opening bracket
         self._match(TokenType.LCB)
         self._struct_body(self.structure)
         self._comment_block()  # Skipping comment before closing bracket
         self._match(TokenType.RCB)
-        if not self.structure.name:
-            self.structure.name = self._struct_name()
-        else:
-            self._struct_name()
+        self.structure.name = self._struct_name()
         try:
             self._match(TokenType.SC)
         except ParserError as e:
