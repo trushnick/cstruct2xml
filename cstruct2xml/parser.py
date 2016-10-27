@@ -209,7 +209,6 @@ class Parser:
         #                CHAR |
         #                INT
         # float_type ->    FLOAT | DOUBLE | LONG DOUBLE
-        # TODO: REFACTOR, code duplicates
         var_type = []
         if self.current.type == TokenType.DOUBLE:
             var_type.append(self._match(TokenType.DOUBLE))

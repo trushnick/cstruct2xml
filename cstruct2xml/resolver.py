@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import lxml.etree as ET
+import lxml.etree as et
+from io import StringIO
 import copy
 
 
@@ -16,9 +17,10 @@ def resolve(xml, defines):
     :param defines: Dict of defines from file in format alias:value
     :return: Transformed xml with resolved types and sizes (str)
     """
-    # TODO: Also try to interpret array size
+    parser = et.XMLParser(remove_blank_text=True)
     if isinstance(xml, str):
-        xml = ET.fromstring(xml)
+        buffer = StringIO(xml)
+        xml = et.parse(buffer, parser)
     # structure_names = [name_tag.text for name_tag in xml.iterfind('structure/name')] # gather names of top-level structures
     structure_names = {structure_obj.find('name').text:structure_obj
                         for structure_obj in xml.iterfind('structure')}
@@ -32,19 +34,13 @@ def resolve(xml, defines):
             var_array_size = var.find('array_size').text
             var_description = var.find('description').text
             print("Resolving: {}".format(var_type))
-            structure_element = copy.copy(structure_names[var_type])
+            structure_element = copy.deepcopy(structure_names[var_type])
             structure_element.find('name').text = var_name
             structure_element.find('description').text = var_description
-            array_size = ET.Element('array_size')
+            array_size = et.Element('array_size')
             array_size.text = str(var_array_size)
             structure_element.insert(2, array_size)
             var.getparent().replace(var, structure_element)
-            # TODO: Need to add variable parametrs to structure
     for var in xml.iterfind('structure/variables/'):
         pass
-    return ET.tostring(xml, encoding='unicode', pretty_print=True)
-
-
-def _resolve_size_structure(structure, defines):
-    for var in structure.iterfind('variables'):
-        array_size = var.find('array_size')
+    return et.tostring(xml, encoding='unicode', pretty_print=True)
