@@ -21,19 +21,16 @@ def resolve(xml, defines):
     if isinstance(xml, str):
         buffer = StringIO(xml)
         xml = et.parse(buffer, parser)
-    # structure_names = [name_tag.text for name_tag in xml.iterfind('structure/name')] # gather names of top-level structures
     structure_names = {structure_obj.find('name').text:structure_obj
                         for structure_obj in xml.iterfind('structure')}
-    # print(structure_names)
-    # print(defines)
     # Now we have both top-level structures names and list of defines, time to resolve something!
+    # Type resolving
     for var in xml.iterfind('structure/variables/variable'):
         var_type = var.find('type').text
         if var_type in structure_names.keys():
             var_name = var.find('name').text
             var_array_size = var.find('array_size').text
             var_description = var.find('description').text
-            print("Resolving: {}".format(var_type))
             structure_element = copy.deepcopy(structure_names[var_type])
             structure_element.find('name').text = var_name
             structure_element.find('description').text = var_description
@@ -41,6 +38,9 @@ def resolve(xml, defines):
             array_size.text = str(var_array_size)
             structure_element.insert(2, array_size)
             var.getparent().replace(var, structure_element)
+    # Array size resolving
     for var in xml.iterfind('structure/variables/'):
-        pass
+        array_size = var.find('array_size').text
+        if array_size in defines.keys():
+            array_size = defines[array_size]
     return et.tostring(xml, encoding='unicode', pretty_print=True)
