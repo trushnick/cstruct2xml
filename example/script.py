@@ -26,7 +26,7 @@ def process_file(file_path):
     original_file_name = os.path.splitext(os.path.basename(file_path))[0]
     structures = []
     root_dir_name = _output_directory if _output_directory \
-                    else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
+        else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
     if not os.path.exists(root_dir_name):
         os.mkdir(root_dir_name)
     for definition in extractor:
@@ -36,8 +36,8 @@ def process_file(file_path):
             structure = parser.parse()
         except ParserError as e:
             print("Coudln't parse structure {}.\nError message: {}".format(
-                    parser.structure.name if parser.structure.name else '%no_name%',
-                    e.message))
+                parser.structure.name if parser.structure.name else '%no_name%',
+                e.message))
         else:
             print("Found structure named {}".format(structure.name))
             structures.append(structure)
@@ -85,7 +85,7 @@ if options.file_only:
 
 print("Using encoding: " + _encoding)
 print("Using output directory: " +
-        _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
+      _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
 print("Converting files: " + str(args))
 if _one_output_per_file:
     print("Generating one output xml per file")
