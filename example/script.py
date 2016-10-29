@@ -7,6 +7,7 @@ from cstruct2xml.extractor import Extractor
 from cstruct2xml.lexer import Lexer
 from cstruct2xml.parser import Parser, ParserError
 from cstruct2xml.convert import convert, convert_file
+import cstruct2xml.resolver as resolver
 
 
 def process_dir(dir_path):
@@ -21,22 +22,22 @@ def process_dir(dir_path):
 
 def process_file(file_path):
     print("Processing: " + file_path + "...")
-    definitions = list(Extractor(file_path, _encoding))
-    original_file_name = os.path.splitext(os.path.basename(file_path))[0]    
+    extractor = Extractor(file_path, _encoding)
+    original_file_name = os.path.splitext(os.path.basename(file_path))[0]
     structures = []
     root_dir_name = _output_directory if _output_directory \
-                    else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
+        else os.path.join(os.path.dirname(file_path), 'cstruct2xml-output')
     if not os.path.exists(root_dir_name):
         os.mkdir(root_dir_name)
-    for definition in definitions:
+    for definition in extractor:
         lexer = Lexer(definition)
         parser = Parser(lexer)
         try:
             structure = parser.parse()
         except ParserError as e:
             print("Coudln't parse structure {}.\nError message: {}".format(
-                    parser.structure.name if parser.structure.name else '%no_name%',
-                    e.message))
+                parser.structure.name if parser.structure.name else '%no_name%',
+                e.message))
         else:
             print("Found structure named {}".format(structure.name))
             structures.append(structure)
@@ -48,6 +49,7 @@ def process_file(file_path):
                 with open(os.path.join(dir_name, structure.name + '.xml'), 'w', encoding=_encoding) as f:
                     f.write(xml)
     xml = convert_file(original_file_name, structures)
+    xml = resolver.resolve(xml, extractor.defines())
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
         f.write(xml)
     print("Done.")
@@ -82,8 +84,8 @@ if options.file_only:
     _one_output_per_file = True
 
 print("Using encoding: " + _encoding)
-print("Using output directory: " + 
-        _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
+print("Using output directory: " +
+      _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
 print("Converting files: " + str(args))
 if _one_output_per_file:
     print("Generating one output xml per file")
