@@ -2,20 +2,18 @@
 Converts C structures into XML-output.
 
 # Usage
-Used to convert structure definitions from C/C++ into xml format. After generating xml, 
-you can use XSLT to transform xml from output format to any other format you need.  
-Originally was made for specific tasks at work.  
+Used to convert structure definitions from C/C++ into xml format.
+This "xml-generator" is made for descriptive structures, so no pointers, vectors, etc. supported.
+After generating xml, you can use XSLT to transform xml from output format to any other format you need.
 
 You can use script from `example` folder to convert structures to xml format.
 Use `-h` option to see script usage.
 
 # Not implemented
-- array size resolving
-- pointers  
-I don't think that pointers will be supported since this utility made for
-descriptive structures (parameters) that don't have any pointers at all.
-- type resolving
+- array size interpretation
+- pointers, vectors, bit fields, dynamic data structures, etc. (Probably will never support this: see usage)
 - binary, octal and hex numbers in array size
+- look-up includes for type resolving
 
 # Tests
 To run tests you can use bash script `run_tests.sh`.  
