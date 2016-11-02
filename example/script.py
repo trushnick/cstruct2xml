@@ -3,6 +3,7 @@
 import optparse
 import os
 import codecs
+import lxml.etree as et # xslt
 from cstruct2xml.extractor import Extractor
 from cstruct2xml.lexer import Lexer
 from cstruct2xml.parser import Parser, ParserError
@@ -52,6 +53,8 @@ def process_file(file_path):
     xml = resolver.resolve(xml, extractor.defines())
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
         f.write(xml)
+    transformed = transform(xml)
+    print(type(transformed))
     print("Done.")
 
 
@@ -85,7 +88,7 @@ if options.file_only:
 
 print("Using encoding: " + _encoding)
 print("Using output directory: " +
-      _output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)')
+      (_output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)'))
 print("Converting files: " + str(args))
 if _one_output_per_file:
     print("Generating one output xml per file")
@@ -95,6 +98,12 @@ else:
 if len(args) == 0:
     print("No files provided, exiting.")
     exit(0)
+
+# xml_parser = et.XMLParser()
+# xml_parser.resolvers.add(FileResolver())
+xsl = et.parse("file.xsl")
+transform = et.XSLT(xsl) # XSL transformation function
+
 for arg in args:
     if os.path.isdir(arg):
         process_dir(arg)
