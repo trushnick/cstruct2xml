@@ -4,11 +4,16 @@ import optparse
 import os
 import codecs
 import lxml.etree as et # xslt
+from io import StringIO
 from cstruct2xml.extractor import Extractor
 from cstruct2xml.lexer import Lexer
 from cstruct2xml.parser import Parser, ParserError
 from cstruct2xml.convert import convert, convert_file
 import cstruct2xml.resolver as resolver
+
+
+xsl = et.parse("file.xsl")
+transform = et.XSLT(xsl) # XSL transformation function
 
 
 def process_dir(dir_path):
@@ -53,8 +58,9 @@ def process_file(file_path):
     xml = resolver.resolve(xml, extractor.defines())
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
         f.write(xml)
-    transformed = transform(xml)
-    print(type(transformed))
+    xml_tree = et.parse(StringIO(xml))
+    transformed = transform(xml_tree) # tree
+    transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'), encoding=_encoding, pretty_print=True)
     print("Done.")
 
 
@@ -98,11 +104,6 @@ else:
 if len(args) == 0:
     print("No files provided, exiting.")
     exit(0)
-
-# xml_parser = et.XMLParser()
-# xml_parser.resolvers.add(FileResolver())
-xsl = et.parse("file.xsl")
-transform = et.XSLT(xsl) # XSL transformation function
 
 for arg in args:
     if os.path.isdir(arg):
