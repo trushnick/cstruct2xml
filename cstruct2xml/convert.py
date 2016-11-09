@@ -8,10 +8,11 @@ def convert_file(name, structures):
     file = ET.Element('file', {'name':name})
     for structure in structures:
         file.append(_convert_structure(structure))
-    return _prettify(file)
+    return file
+
 
 def convert(structure):
-    return _prettify(_convert_structure(structure))
+    return _convert_structure(structure)
 
 
 def _convert_structure(structure, count = 0):
@@ -19,29 +20,28 @@ def _convert_structure(structure, count = 0):
 
     name = ET.Element('name')
     name.text = structure.name
+    struct.append(name)
 
     description = ET.Element('description')
     description.text = structure.description
+    struct.append(description)
 
     if count:
         array_size = ET.Element('array_size')
         array_size.text = str(count)
+        struct.append(array_size)
 
     variables = ET.Element('variables')
     for v in structure.variables:
         v_element = _convert_variable(v)
         variables.append(v_element)
-
-    struct.append(name)
-    struct.append(description)
     struct.append(variables)
-    if count:
-        struct.append(array_size)
 
     return struct
 
 
 def _convert_variable(variable):
+
     if variable.type == 'struct':
         var_el = _convert_structure(variable.value, variable.array_size)
     else:

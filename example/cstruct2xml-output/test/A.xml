@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<structure>
+  <name>A</name>
+  <description></description>
+  <variables>
+    <variable>
+      <name>foo</name>
+      <type>int</type>
+      <description></description>
+      <array_size>1</array_size>
+    </variable>
+    <variable>
+      <name>bar</name>
+      <type>double</type>
+      <description></description>
+      <array_size>15</array_size>
+    </variable>
+  </variables>
+</structure>

@@ -42,4 +42,4 @@ def resolve(xml, defines):
         array_size = var.find('array_size').text
         if array_size in defines.keys():
             var.find('array_size').text = str(defines[array_size])
-    return et.tostring(xml, encoding='unicode', pretty_print=True)
+    return xml

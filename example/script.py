@@ -52,15 +52,16 @@ def process_file(file_path):
                 dir_name = os.path.join(root_dir_name, original_file_name)
                 if not os.path.exists(dir_name):
                     os.mkdir(dir_name)
-                with open(os.path.join(dir_name, structure.name + '.xml'), 'w', encoding=_encoding) as f:
-                    f.write(xml)
+                with open(os.path.join(dir_name, structure.name + '.xml'), 'wb') as f:
+                    f.write(et.tostring(xml, xml_declaration=True, encoding=_encoding, pretty_print=True))
     xml = convert_file(original_file_name, structures)
     xml = resolver.resolve(xml, extractor.defines())
-    with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'w', encoding=_encoding) as f:
-        f.write(xml)
-    xml_tree = et.parse(StringIO(xml))
-    transformed = transform(xml_tree) # tree
-    transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'), encoding=_encoding, pretty_print=True)
+    with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'wb') as f:
+        f.write(et.tostring(xml, encoding=_encoding, pretty_print=True))
+    # xml_tree = et.parse(StringIO(xml))
+    transformed = transform(xml) # tree
+    transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'),
+                      xml_declaration=True, encoding=_encoding, pretty_print=True)
     print("Done.")
 
 
