@@ -1,12 +1,12 @@
 <file name="test">
   <structure>
     <name>A</name>
-    <description></description>
+    <description>Struct A description</description>
     <variables>
       <variable>
         <name>foo</name>
         <type>int</type>
-        <description></description>
+        <description>field 'foo' of A struct</description>
         <array_size>1</array_size>
       </variable>
       <variable>
@@ -23,13 +23,13 @@
     <variables>
       <structure>
         <name>a</name>
-        <description></description>
+        <description>Struct A description</description>
         <array_size>1</array_size>
         <variables>
           <variable>
             <name>foo</name>
             <type>int</type>
-            <description></description>
+            <description>field 'foo' of A struct</description>
             <array_size>1</array_size>
           </variable>
           <variable>
@@ -48,7 +48,7 @@
       </variable>
       <structure>
         <name>bars</name>
-        <description></description>
+        <description>some inner structure</description>
         <array_size>5</array_size>
         <variables>
           <variable>

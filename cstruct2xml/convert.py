@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import lxml.etree as ET
-from xml.dom import minidom
 
 
 def convert_file(name, structures):

@@ -58,7 +58,6 @@ def process_file(file_path):
     xml = resolver.resolve(xml, extractor.defines())
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'wb') as f:
         f.write(et.tostring(xml, encoding=_encoding, pretty_print=True))
-    # xml_tree = et.parse(StringIO(xml))
     transformed = transform(xml) # tree
     transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'),
                       xml_declaration=True, encoding=_encoding, pretty_print=True)

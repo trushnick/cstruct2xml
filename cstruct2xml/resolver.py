@@ -15,7 +15,7 @@ def resolve(xml, defines):
     it will look up in the defines for the value. If there is binary/octal/hex number, it will convert it to decimal.
     :param xml: Generated xml for one file (either root element or str)
     :param defines: Dict of defines from file in format alias:value
-    :return: Transformed xml with resolved types and sizes (str)
+    :return: root element of xml tree (etree._Element)
     """
     parser = et.XMLParser(remove_blank_text=True)
     if isinstance(xml, str):
@@ -32,7 +32,9 @@ def resolve(xml, defines):
             var_description = var.find('description').text
             structure_element = copy.deepcopy(structure_names[var_type])
             structure_element.find('name').text = var_name
-            structure_element.find('description').text = var_description
+            # If var description is not absent, taking it's description (otherwise left structrure description)
+            if var_description != '':
+                structure_element.find('description').text = var_description
             array_size = et.Element('array_size')
             array_size.text = str(var_array_size)
             structure_element.insert(2, array_size)

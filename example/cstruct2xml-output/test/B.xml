@@ -17,7 +17,7 @@
     </variable>
     <structure>
       <name>bars</name>
-      <description></description>
+      <description>some inner structure</description>
       <array_size>5</array_size>
       <variables>
         <variable>
