@@ -4,12 +4,11 @@ import optparse
 import os
 import codecs
 import lxml.etree as et # xslt
-from io import StringIO
-from cstruct2xml.extractor import Extractor
-from cstruct2xml.lexer import Lexer
-from cstruct2xml.parser import Parser, ParserError
-from cstruct2xml.convert import convert, convert_file
-import cstruct2xml.resolver as resolver
+from lib.extractor import Extractor
+from lib.lexer import Lexer
+from lib.parser import Parser, ParserError
+from lib.convert import convert, convert_file
+import lib.resolver as resolver
 
 
 xsl = et.parse("file.xsl")
@@ -75,12 +74,12 @@ opt_parser.add_option('-d', dest='directory',
 opt_parser.add_option('--file-only', action='store_true', dest='file_only', default=False,
                       help='Generate only one xml per file')
 options, args = opt_parser.parse_args()
+
 if options.encoding:
     try:
         codecs.lookup(options.encoding)
     except LookupError:
         print("Encoding " + options.encoding + " is not supported!")
-        print(opt_parser.usage)
         exit(1)
     _encoding = options.encoding
 if options.directory:
@@ -95,7 +94,6 @@ if options.file_only:
 print("Using encoding: " + _encoding)
 print("Using output directory: " +
       (_output_directory if _output_directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)'))
-print("Converting files: " + str(args))
 if _one_output_per_file:
     print("Generating one output xml per file")
 else:

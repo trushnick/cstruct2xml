@@ -1,7 +1,7 @@
 # Grammmar
 # %empty% means empty string
 
-struct_def                  ->  comment_block TYPEDEF STRUCT LCB struct_body RCB struct_name SC
+struct_def                  ->  comment_block TYPEDEF? STRUCT LCB struct_body RCB struct_name SC
 comment_block               ->  comment_block comment |
                                 comment |
                                 %empty%

@@ -5,7 +5,7 @@ from io import StringIO
 import copy
 
 
-def resolve(xml, defines):
+def resolve(xml, defines=None):
     """
     Runs through xml checking all <type> and <array_size> tags.
     If type or array size is unresolved, it tries to resolve it.
@@ -40,8 +40,9 @@ def resolve(xml, defines):
             structure_element.insert(2, array_size)
             var.getparent().replace(var, structure_element)
     # Array size resolving
-    for var in xml.iterfind('structure/variables/'):
-        array_size = var.find('array_size').text
-        if array_size in defines.keys():
-            var.find('array_size').text = str(defines[array_size])
+    if defines is not None:
+        for var in xml.iterfind('structure/variables/'):
+            array_size = var.find('array_size').text
+            if array_size in defines.keys():
+                var.find('array_size').text = str(defines[array_size])
     return xml

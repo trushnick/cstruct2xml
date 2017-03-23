@@ -70,6 +70,8 @@ class Variable:
         self.type = None
         self.value = None
         self.array_size = None
+        self.messure = None
+        self.accuracy = None
 
 
 class Parser:
@@ -304,6 +306,6 @@ class Parser:
 
 class ParserError(Exception):
 
-    def __init__(self, message="Unknown message"):
+    def __init__(self, message=""):
         self.message = message
         super(ParserError, self).__init__(message)
