@@ -70,7 +70,7 @@ class Variable:
         self.type = None
         self.value = None
         self.array_size = None
-        self.params = None
+        self.params = {}
 
 
 class Parser:
@@ -124,9 +124,8 @@ class Parser:
             comment_block.append(comment)
             self.current = next(self.lexer_iter)
         desc = '\n'.join(comment_block)
-        param_list = re.findall('@\w+=\w+', desc)
         params = {}
-        for param in param_list:
+        for param in re.findall('@\w+=\w+', desc):
             desc = desc.replace(param, '')
             m = re.match(r'@(\w+)=(\w+)', param)
             params[m.group(1)] = m.group(2)

@@ -3,7 +3,7 @@
 import optparse
 import os
 import codecs
-import lxml.etree as et # xslt
+import lxml.etree as et
 from lib.extractor import Extractor
 from lib.lexer import Lexer
 from lib.parser import Parser, ParserError
@@ -53,9 +53,10 @@ def process_file(file_path):
     xml = resolver.resolve(xml, extractor.defines())
     with open(os.path.join(root_dir_name, original_file_name + '.xml'), 'wb') as f:
         f.write(et.tostring(xml, encoding=_encoding, pretty_print=True))
-    transformed = transform(xml) # tree
-    transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'),
-                      xml_declaration=True, encoding=_encoding, pretty_print=True)
+    if options.xslt:
+        transformed = transform(xml) # tree
+        transformed.write(os.path.join(root_dir_name, original_file_name + '-transformed.xml'),
+                          xml_declaration=True, encoding=_encoding, pretty_print=True)
     print("Done.")
 
 
