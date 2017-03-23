@@ -44,7 +44,7 @@ def process_file(file_path):
                 parser.structure.name if parser.structure.name else '%no_name%',
                 e.message))
         else:
-            print("Found structure named {}".format(structure.name))
+            print("Found structure {}".format(structure.name))
             structures.append(structure)
             if not _one_output_per_file:
                 xml = convert(structure)

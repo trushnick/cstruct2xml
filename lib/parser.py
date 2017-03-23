@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from .tokens import TokenType
+import re
 
 # Sign mods for primitive int types
 _sign_mods = [TokenType.SIGNED, TokenType.UNSIGNED]
@@ -70,8 +70,7 @@ class Variable:
         self.type = None
         self.value = None
         self.array_size = None
-        self.messure = None
-        self.accuracy = None
+        self.params = None
 
 
 class Parser:
@@ -89,7 +88,7 @@ class Parser:
     def _struct_def(self):
         # struct_def -> comment_block TYPEDEF? STRUCT struct_name1? LCB struct_body RCB struct_name SC
         # Decided to use second name (alias) as structure name, for resolving
-        self.structure.description = self._comment_block()
+        self.structure.description, _ = self._comment_block()
         if self.current.type == TokenType.TYPEDEF:
             self._match(TokenType.TYPEDEF)
         self._match(TokenType.STRUCT)
@@ -114,7 +113,7 @@ class Parser:
 
     def _comment_block(self):
         # comment_block -> comment_block comment | comment | %empty%
-        comment_block = ''
+        comment_block = []
         while self.current.type in [TokenType.END_OF_LINE_COMMENT, TokenType.TRADITIONAL_COMMENT]:
             comment = self.current.value[2:]
             if self.current.type == TokenType.TRADITIONAL_COMMENT:
@@ -122,9 +121,18 @@ class Parser:
                 comment = '\n'.join(line.strip() for line in comment.split('\n'))
             else:
                 comment = comment.strip()
-            comment_block += '\n' + comment
+            comment_block.append(comment)
             self.current = next(self.lexer_iter)
-        return comment_block.strip()
+        desc = '\n'.join(comment_block)
+        param_list = re.findall('@\w+=\w+', desc)
+        params = {}
+        for param in param_list:
+            desc = desc.replace(param, '')
+            m = re.match(r'@(\w+)=(\w+)', param)
+            params[m.group(1)] = m.group(2)
+        # Refactor description after deleting all params
+        desc = '\n'.join([line.strip() for line in desc.split('\n')]).strip()
+        return desc, params
 
     def _struct_body(self, structure):
         # struct_body ->    stuct_body struct_member |
@@ -142,7 +150,7 @@ class Parser:
     def _struct_member(self):
         # struct_member ->  inner_struct_def |
         #                   var_decl
-        description = self._comment_block()
+        description, params = self._comment_block()
         if self.current.type == TokenType.RCB:  # Comment block before closing bracket of structure
             return None
         elif self.current.type == TokenType.STRUCT:
@@ -150,6 +158,7 @@ class Parser:
             variable.value.description = description
         else:
             variable = self._var_decl()
+            variable.params = params
         variable.description = description
         return variable
 

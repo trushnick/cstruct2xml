@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import lxml.etree as ET
 
@@ -62,6 +61,12 @@ def _convert_variable(variable):
         var_el.append(type)
         var_el.append(description)
         var_el.append(array_size)
+
+        for param in variable.params:
+            param_el = ET.Element(param)
+            param_el.text = variable.params[param]
+            var_el.append(param_el)
+
     return var_el
 
 
