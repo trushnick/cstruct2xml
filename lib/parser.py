@@ -58,18 +58,18 @@ _type_groups = {
 class Structure:
 
     def __init__(self):
-        self.name = None
-        self.description = None
+        self.name = "NONAME"
+        self.description = ""
         self.variables = []
 
 
 class Variable:
 
     def __init__(self):
-        self.description = None
-        self.type = None
-        self.value = None
-        self.array_size = None
+        self.description = ""
+        self.type = "NOTYPE"
+        self.value = "NOVALUE"
+        self.array_size = 1
         self.params = {}
 
 
@@ -108,8 +108,7 @@ class Parser:
             else:
                 return self.structure
         else:
-            raise ParserError("End of lexemes expected, but {} found".format(
-                self.current))
+            raise ParserError(f"End of lexemes expected, but {self.current} found")
 
     def _comment_block(self):
         # comment_block -> comment_block comment | comment | %empty%
@@ -307,8 +306,8 @@ class Parser:
                 raise ParserError("{} expected, but end of lexemes found".format(ttype))
             return token.value
         else:
-            message = "Wrong lexeme {} at line {}, pos {}. {} expected".format(
-                self.current, self.lexer.line_number, self.lexer.line_pos, ttype)
+            message = f"Wrong lexeme {self.current} at line {self.lexer.line_number}, " \
+                      f"pos {self.lexer.line_pos}. {ttype} expected"
             raise ParserError(message)
 
 

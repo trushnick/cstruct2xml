@@ -22,7 +22,7 @@ def process_dir(dir_path):
 
 
 def process_file(file_path):
-    print("Processing: " + file_path + "...")
+    print(f"Processing: {file_path}...")
     extractor = Extractor(file_path, options.encoding)
     original_file_name = os.path.splitext(os.path.basename(file_path))[0]
     structures = []
@@ -36,7 +36,7 @@ def process_file(file_path):
         try:
             structure = parser.parse()
         except ParserError as e:
-            print("Coudln't parse structure {}.\nError message: {}".format(
+            print("Coudln't parse structure {parser.structure.name}.\nError message: {}".format(
                 parser.structure.name if parser.structure.name else '%no_name%',
                 e.message))
         else:
@@ -76,18 +76,18 @@ options, args = opt_parser.parse_args()
 try:
     codecs.lookup(options.encoding)
 except LookupError:
-    print("Encoding " + options.encoding + " is not supported!")
+    print(f"Encoding {options.encoding} is not supported!")
     exit(1)
 _encoding = options.encoding
 if options.directory:
     if not os.path.isdir(options.directory):
-        print("Directory '" + options.directory + "' doesn't exists")
+        print(f"Directory '{options.directory}' doesn't exists")
         exit(1)
 if options.xslt:
     xsl = et.parse(options.xslt)
     transform = et.XSLT(xsl)  # XSL transformation function
 
-print("Using encoding: " + options.encoding)
+print(f"Using encoding: {options.encoding}")
 print("Using output directory: " +
       (options.directory if options.directory else 'DEFAULT ([file-dir]/cstruct2xml-output/)'))
 if options.file_only:
@@ -101,4 +101,4 @@ for arg in args:
     elif os.path.isfile(arg):
         process_file(arg)
     else:
-        print("Wrong argument: '" + arg + "'! Skipping...")
+        print(f"Wrong argument: '{arg}'! Skipping...")

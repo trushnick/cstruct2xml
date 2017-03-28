@@ -48,5 +48,5 @@ class Lexer:
 class LexerError(Exception):
 
     def __init__(self, line_num, line_pos, text):
-        message = 'Cannot recognize lexeme at line {0} at pos {1}: {2}'.format(line_num, line_pos, text)
+        message = f'Cannot recognize lexeme at line {line_num} at pos {line_pos}: {text}'
         super(LexerError, self).__init__(message)
